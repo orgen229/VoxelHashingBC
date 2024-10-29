@@ -85,7 +85,7 @@ namespace voxelStruct {
         return std::make_tuple(mini_x, mini_y, mini_z);
     }
 
-}  
+}
 template class voxelStruct::VoxelHashing<pcl::PointXYZ>;
 template class voxelStruct::VoxelHashing<pcl::PointXYZRGB>;
 template class voxelStruct::VoxelHashing<pcl::PointNormal>;
