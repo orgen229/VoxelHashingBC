@@ -2,7 +2,11 @@
 #define VOXEL_HASHING_ARRAY_H
 
 #include "voxel_hashing.h"
+#include <memory>
+#include <unordered_map>
+#include <tuple>
 #include <array>
+#include <vector>
 
 namespace voxelStruct {
 
@@ -17,7 +21,7 @@ namespace voxelStruct {
 
         std::unordered_map<
             std::tuple<int, int, int>,
-            std::array<std::array<std::array<std::vector<PointT>, mini_grid_size>, mini_grid_size>, mini_grid_size>,
+            std::shared_ptr<std::array<std::array<std::array<std::vector<PointT>, mini_grid_size>, mini_grid_size>, mini_grid_size>>,
             VoxelHash
         > voxel_map_;
 
@@ -27,10 +31,13 @@ namespace voxelStruct {
 
         
 
-        auto createEmptyMiniVoxels();
+        std::shared_ptr<std::array<std::array<std::array<std::vector<PointT>, mini_grid_size>, mini_grid_size>, mini_grid_size>> createEmptyMiniVoxels();
         std::tuple<int, int, int> getVoxelIndex(const PointT& point) const override;
         std::tuple<int, int, int> getMiniVoxelIndex(const PointT& point, const std::tuple<int, int, int>& voxel_index) const override;
     };
-}
 
-#endif
+} 
+
+#include "voxel_hashing_array.hpp"  
+
+#endif  

@@ -45,16 +45,17 @@ int main() {
 
     return 0;
 }
-
 /*
 #include <iostream>
 #include <pcl/io/ply_io.h>
 #include <pcl/point_types.h>
 #include <pcl/point_cloud.h>
+#include <cassert>
+#include <omp.h> 
 #include "voxel_hashing_array.h"
 
 int main() {
-    
+  
     std::string file_path = "C:\\test.ply";
 
     
@@ -64,26 +65,36 @@ int main() {
         return -1;
     }
 
-    std::cout << "Loaded " << cloud->points.size() << " points." << std::endl;
+    std::cout << "Loaded " << cloud->points.size() << " points from file." << std::endl;
 
-    
-    float voxel_size = 0.1f;
-    float mini_voxel_size = 0.05f;
+   
+    float voxel_size = 0.5f;
+    float mini_voxel_size = voxel_size / 10;
     constexpr std::size_t mini_grid_size = 10;
+
+   
     voxelStruct::VoxelHashingArray<pcl::PointXYZ, mini_grid_size> voxelHashingArray(voxel_size, mini_voxel_size);
 
-    
-    for (std::size_t i = 0; i < std::min(static_cast<std::size_t>(100), cloud->points.size()); ++i) {
+   
+    std::size_t num_points = cloud->points.size();
+    int progress_step = 100000;  
+
+#pragma omp parallel for
+    for (std::size_t i = 0; i < num_points; ++i) {
         voxelHashingArray.addPoint(cloud->points[i]);
+        if (i % progress_step == 0) {
+#pragma omp critical
+            std::cout << "Progress: " << i << " points processed." << std::endl;
+        }
     }
 
-    std::cout << "First 100 points have been added to the VoxelHashingArray structure." << std::endl;
+    std::cout << "All points have been added to the VoxelHashingArray structure." << std::endl;
 
     
-    int total_point_count = 0; 
-    for (const auto& voxel_pair : voxelHashingArray.voxel_map_) {
-        const auto& mini_voxel_array = voxel_pair.second;
+    int total_point_count = 0;
 
+    for (const auto& voxel_pair : voxelHashingArray.voxel_map_) {
+        const auto& mini_voxel_array = *voxel_pair.second;
         for (const auto& mini_voxel_x : mini_voxel_array) {
             for (const auto& mini_voxel_y : mini_voxel_x) {
                 for (const auto& mini_voxel_z : mini_voxel_y) {
@@ -95,8 +106,16 @@ int main() {
 
     std::cout << "Total number of points in all voxels: " << total_point_count << std::endl;
 
+   
+    assert(total_point_count == cloud->points.size() && "Mismatch in point count: Not all points were added correctly.");
+
+    if (total_point_count == cloud->points.size()) {
+        std::cout << "Test passed: All points are correctly added to the voxel map." << std::endl;
+    }
+    else {
+        std::cerr << "Test failed: Number of points in voxel map does not match the input point count." << std::endl;
+    }
+
     return 0;
 }
-
-
 */

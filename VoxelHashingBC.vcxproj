@@ -128,12 +128,15 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="VoxelHashingBC.cpp" />
-    <ClCompile Include="voxel_hashing.cpp" />
-    <ClCompile Include="voxel_hashing_array.cpp" />
+    <ClCompile Include="voxel_hashing.hpp" />
+    <ClCompile Include="voxel_hashing_array.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="voxel_hashing.h" />
     <ClInclude Include="voxel_hashing_array.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="VoxelHashingBC.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

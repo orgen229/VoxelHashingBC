@@ -18,11 +18,11 @@
     <ClCompile Include="VoxelHashingBC.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="voxel_hashing.cpp">
-      <Filter>Исходные файлы</Filter>
+    <ClCompile Include="voxel_hashing_array.hpp">
+      <Filter>Файлы заголовков</Filter>
     </ClCompile>
-    <ClCompile Include="voxel_hashing_array.cpp">
-      <Filter>Исходные файлы</Filter>
+    <ClCompile Include="voxel_hashing.hpp">
+      <Filter>Файлы заголовков</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -32,5 +32,10 @@
     <ClInclude Include="voxel_hashing_array.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="VoxelHashingBC.rc">
+      <Filter>Файлы ресурсов</Filter>
+    </ResourceCompile>
   </ItemGroup>
 </Project>
