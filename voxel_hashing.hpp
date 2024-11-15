@@ -66,6 +66,31 @@ namespace voxelStruct {
         return vector;
     }
 
+    
+    template <typename PointT>
+    std::vector<PointT> VoxelHashing<PointT>::selectAllPointsFromMiniVoxel(
+        const std::tuple<int, int, int>& voxel_index,
+        const std::tuple<int, int, int>& mini_voxel_index) {
+
+        std::vector<PointT> result;
+
+        auto voxel_it = voxel_map_.find(voxel_index);
+        if (voxel_it == voxel_map_.end()) {
+            return result; 
+        }
+
+        const auto& mini_voxel_map = voxel_it->second;
+        auto mini_voxel_it = mini_voxel_map.find(mini_voxel_index);
+
+        if (mini_voxel_it == mini_voxel_map.end()) {
+            return result; 
+        }
+
+       
+        result = mini_voxel_it->second;
+        return result;
+    }
+
     template <typename PointT>
     std::tuple<int, int, int> VoxelHashing<PointT>::getVoxelIndex(const PointT& point) const {
         return std::make_tuple(
@@ -88,6 +113,6 @@ namespace voxelStruct {
         return std::make_tuple(mini_x, mini_y, mini_z);
     }
 
-}  
+}
 
-#endif  
+#endif

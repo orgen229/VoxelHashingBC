@@ -127,13 +127,17 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="array_search.hpp" />
     <ClCompile Include="VoxelHashingBC.cpp" />
     <ClCompile Include="voxel_hashing.hpp" />
     <ClCompile Include="voxel_hashing_array.hpp" />
+    <ClCompile Include="voxel_search.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="array_search.h" />
     <ClInclude Include="voxel_hashing.h" />
     <ClInclude Include="voxel_hashing_array.h" />
+    <ClInclude Include="voxel_search.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="VoxelHashingBC.rc" />

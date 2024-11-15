@@ -19,25 +19,26 @@ namespace voxelStruct {
         bool IsPointInVoxel(const PointT& point) override;
         std::vector<PointT> selectAllPointsFromVoxel(const std::tuple<int, int, int>& voxel_index) override;
 
+        
         std::unordered_map<
             std::tuple<int, int, int>,
             std::shared_ptr<std::array<std::array<std::array<std::vector<PointT>, mini_grid_size>, mini_grid_size>, mini_grid_size>>,
             VoxelHash
         > voxel_map_;
 
-    private:
+        std::tuple<int, int, int> getVoxelIndex(const PointT& point) const override;
+        std::tuple<int, int, int> getMiniVoxelIndex(const PointT& point, const std::tuple<int, int, int>& voxel_index) const override;
+
+    protected:
         using VoxelHashing<PointT>::voxel_size_;
         using VoxelHashing<PointT>::mini_voxel_size_;
 
-        
-
         std::shared_ptr<std::array<std::array<std::array<std::vector<PointT>, mini_grid_size>, mini_grid_size>, mini_grid_size>> createEmptyMiniVoxels();
-        std::tuple<int, int, int> getVoxelIndex(const PointT& point) const override;
-        std::tuple<int, int, int> getMiniVoxelIndex(const PointT& point, const std::tuple<int, int, int>& voxel_index) const override;
+
     };
 
-} 
+}
 
 #include "voxel_hashing_array.hpp"  
 
-#endif  
+#endif

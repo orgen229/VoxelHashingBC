@@ -26,6 +26,11 @@ namespace voxelStruct {
         if (mini_y < 0) mini_y = 0;
         if (mini_z < 0) mini_z = 0;
 
+        
+        if ((*voxel_map_[voxel_index])[mini_x][mini_y][mini_z].empty()) {
+            (*voxel_map_[voxel_index])[mini_x][mini_y][mini_z].reserve(1);  
+        }
+
         (*voxel_map_[voxel_index])[mini_x][mini_y][mini_z].push_back(point);
     }
 
@@ -74,15 +79,8 @@ namespace voxelStruct {
     template <typename PointT, std::size_t mini_grid_size>
     std::shared_ptr<std::array<std::array<std::array<std::vector<PointT>, mini_grid_size>, mini_grid_size>, mini_grid_size>>
         VoxelHashingArray<PointT, mini_grid_size>::createEmptyMiniVoxels() {
-        auto mini_voxels = std::make_shared<std::array<std::array<std::array<std::vector<PointT>, mini_grid_size>, mini_grid_size>, mini_grid_size>>();
-        for (auto& x : *mini_voxels) {
-            for (auto& y : x) {
-                for (auto& z : y) {
-                    z = std::vector<PointT>();
-                }
-            }
-        }
-        return mini_voxels;
+        
+        return std::make_shared<std::array<std::array<std::array<std::vector<PointT>, mini_grid_size>, mini_grid_size>, mini_grid_size>>();
     }
 
     template <typename PointT, std::size_t mini_grid_size>
@@ -95,6 +93,6 @@ namespace voxelStruct {
         return VoxelHashing<PointT>::getMiniVoxelIndex(point, voxel_index);
     }
 
-} 
+}
 
-#endif  
+#endif

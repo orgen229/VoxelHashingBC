@@ -25,25 +25,27 @@ namespace voxelStruct {
         virtual void addPoint(const PointT& point);
         virtual bool IsPointInVoxel(const PointT& point);
         virtual std::vector<PointT> selectAllPointsFromVoxel(const std::tuple<int, int, int>& voxel_index);
+        virtual std::vector<PointT> selectAllPointsFromMiniVoxel(
+            const std::tuple<int, int, int>& voxel_index,
+            const std::tuple<int, int, int>& mini_voxel_index);
+
+        virtual std::tuple<int, int, int> getVoxelIndex(const PointT& point) const;
+        virtual std::tuple<int, int, int> getMiniVoxelIndex(const PointT& point, const std::tuple<int, int, int>& voxel_index) const;
+
+    protected:
+       
+        float voxel_size_, mini_voxel_size_;
+        int mini_grid_size_;
 
         std::unordered_map<
             std::tuple<int, int, int>,
             std::unordered_map<std::tuple<int, int, int>, std::vector<PointT>, VoxelHash>,
             VoxelHash
         > voxel_map_;
-
-    protected:
-        float voxel_size_, mini_voxel_size_;
-        int mini_grid_size_;
-
-        virtual std::tuple<int, int, int> getVoxelIndex(const PointT& point) const;
-        virtual std::tuple<int, int, int> getMiniVoxelIndex(const PointT& point, const std::tuple<int, int, int>& voxel_index) const;
-
-        
     };
 
-} 
+}
 
-#include "voxel_hashing.hpp"  
+#include "voxel_hashing.hpp"
 
-#endif  
+#endif
