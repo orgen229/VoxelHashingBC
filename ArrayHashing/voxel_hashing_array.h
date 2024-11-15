@@ -1,7 +1,7 @@
 #ifndef VOXEL_HASHING_ARRAY_H
 #define VOXEL_HASHING_ARRAY_H
 
-#include "voxel_hashing.h"
+#include "../MapHashing/voxel_hashing.h"
 #include <memory>
 #include <unordered_map>
 #include <tuple>

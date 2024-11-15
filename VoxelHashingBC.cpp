@@ -53,8 +53,8 @@ int main() {
 #include <pcl/point_cloud.h>
 #include <cassert>
 #include <omp.h> 
-#include "voxel_hashing_array.h"
-#include "array_search.h"  // Подключаем ArraySearch
+#include "ArrayHashing/voxel_hashing_array.h"
+#include "ArrayHashing/array_search.h"  // Подключаем ArraySearch
 
 int main() {
     std::string file_path = "C:\\test.ply";

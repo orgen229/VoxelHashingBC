@@ -2,11 +2,6 @@
 #define ARRAY_SEARCH_HPP
 
 #include "array_search.h"
-#include <queue>
-#include <tuple>
-#include <cmath>
-#include <vector>
-#include <algorithm>
 
 namespace voxelStruct {
 
@@ -16,7 +11,7 @@ namespace voxelStruct {
 
     template <typename PointT, std::size_t mini_grid_size>
     std::tuple<int, int, int> ArraySearch<PointT, mini_grid_size>::adjustIndices(
-        int x, int y, int z, std::tuple<int, int, int> voxel_index) const {
+        int x, int y, int z, std::tuple<int, int, int>& voxel_index) const {
 
         if (x < 0) {
             --std::get<0>(voxel_index);
@@ -45,20 +40,20 @@ namespace voxelStruct {
             z -= mini_grid_size;
         }
 
-        return { x, y, z, voxel_index };
+        return { x, y, z };
     }
 
     template <typename PointT, std::size_t mini_grid_size>
     std::vector<PointT> ArraySearch<PointT, mini_grid_size>::findKNearestNeighbors(
         const PointT& query_point, int k, float max_distance) const {
 
-        using Neighbor = std::pair<float, const PointT&>;
+        using Neighbor = std::pair<float, PointT>;
 
         auto cmp = [](const Neighbor& left, const Neighbor& right) {
             return left.first > right.first;
             };
 
-        std::priority_queue<Neighbor, std::vector<Neighbor>, decltype(cmp)> neighbors(cmp);
+        std::priority_queue<Neighbor, std::vector<Neighbor>, decltype(cmp)> neighbors{ cmp };
         auto voxel_index = this->getVoxelIndex(query_point);
         auto mini_voxel_index = this->getMiniVoxelIndex(query_point, voxel_index);
         int layer_count = static_cast<int>(std::ceil(max_distance / this->mini_voxel_size_));
@@ -66,11 +61,12 @@ namespace voxelStruct {
         for (int dx = -layer_count; dx <= layer_count; ++dx) {
             for (int dy = -layer_count; dy <= layer_count; ++dy) {
                 for (int dz = -layer_count; dz <= layer_count; ++dz) {
-                    auto [nx, ny, nz, neighbor_voxel_index] = adjustIndices(
+                    auto neighbor_voxel_index = voxel_index;
+                    auto [nx, ny, nz] = adjustIndices(
                         std::get<0>(mini_voxel_index) + dx,
                         std::get<1>(mini_voxel_index) + dy,
                         std::get<2>(mini_voxel_index) + dz,
-                        voxel_index
+                        neighbor_voxel_index
                     );
 
                     auto voxel_it = this->voxel_map_.find(neighbor_voxel_index);
@@ -78,10 +74,10 @@ namespace voxelStruct {
 
                     const auto& points = (*voxel_it->second)[nx][ny][nz];
                     for (const auto& point : points) {
-                        float distance = std::hypot(
-                            query_point.x - point.x,
-                            query_point.y - point.y,
-                            query_point.z - point.z
+                        float distance = std::sqrt(
+                            std::pow(query_point.x - point.x, 2) +
+                            std::pow(query_point.y - point.y, 2) +
+                            std::pow(query_point.z - point.z, 2)
                         );
 
                         if (distance <= max_distance) {
@@ -99,7 +95,7 @@ namespace voxelStruct {
         }
 
         std::vector<PointT> result;
-        result.reserve(neighbors.size()); 
+        result.reserve(neighbors.size());
         while (!neighbors.empty()) {
             result.push_back(neighbors.top().second);
             neighbors.pop();
@@ -120,11 +116,12 @@ namespace voxelStruct {
         for (int dx = -layer_count; dx <= layer_count; ++dx) {
             for (int dy = -layer_count; dy <= layer_count; ++dy) {
                 for (int dz = -layer_count; dz <= layer_count; ++dz) {
-                    auto [nx, ny, nz, neighbor_voxel_index] = adjustIndices(
+                    auto neighbor_voxel_index = voxel_index;
+                    auto [nx, ny, nz] = adjustIndices(
                         std::get<0>(mini_voxel_index) + dx,
                         std::get<1>(mini_voxel_index) + dy,
                         std::get<2>(mini_voxel_index) + dz,
-                        voxel_index
+                        neighbor_voxel_index
                     );
 
                     auto voxel_it = this->voxel_map_.find(neighbor_voxel_index);
@@ -132,10 +129,10 @@ namespace voxelStruct {
 
                     const auto& points = (*voxel_it->second)[nx][ny][nz];
                     for (const auto& point : points) {
-                        float distance = std::hypot(
-                            query_point.x - point.x,
-                            query_point.y - point.y,
-                            query_point.z - point.z
+                        float distance = std::sqrt(
+                            std::pow(query_point.x - point.x, 2) +
+                            std::pow(query_point.y - point.y, 2) +
+                            std::pow(query_point.z - point.z, 2)
                         );
 
                         if (distance <= max_distance) {
@@ -149,6 +146,6 @@ namespace voxelStruct {
         return result;
     }
 
-} 
+} // namespace voxelStruct
 
-#endif 
+#endif // ARRAY_SEARCH_HPP

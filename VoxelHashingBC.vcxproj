@@ -104,6 +104,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -127,20 +128,20 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="array_search.hpp" />
     <ClCompile Include="VoxelHashingBC.cpp" />
-    <ClCompile Include="voxel_hashing.hpp" />
-    <ClCompile Include="voxel_hashing_array.hpp" />
-    <ClCompile Include="voxel_search.hpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="array_search.h" />
-    <ClInclude Include="voxel_hashing.h" />
-    <ClInclude Include="voxel_hashing_array.h" />
-    <ClInclude Include="voxel_search.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="VoxelHashingBC.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ArrayHashing\array_search.h" />
+    <ClInclude Include="ArrayHashing\array_search.hpp" />
+    <ClInclude Include="ArrayHashing\voxel_hashing_array.h" />
+    <ClInclude Include="ArrayHashing\voxel_hashing_array.hpp" />
+    <ClInclude Include="MapHashing\voxel_hashing.h" />
+    <ClInclude Include="MapHashing\voxel_hashing.hpp" />
+    <ClInclude Include="MapHashing\voxel_search.h" />
+    <ClInclude Include="MapHashing\voxel_search.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
