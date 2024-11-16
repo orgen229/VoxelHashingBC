@@ -1,50 +1,50 @@
-#ifndef ARRAY_SEARCH_HPP
-#define ARRAY_SEARCH_HPP
+#ifndef VOXEL_SEARCH_HPP
+#define VOXEL_SEARCH_HPP
 
-#include "array_search.h"
+#include "../voxel_search.h"
 
 namespace voxelStruct {
 
-    template <typename PointT, std::size_t mini_grid_size>
-    ArraySearch<PointT, mini_grid_size>::ArraySearch(float voxel_size, float mini_voxel_size)
-        : VoxelHashingArray<PointT, mini_grid_size>(voxel_size, mini_voxel_size) {}
+    template <typename PointT>
+    VoxelSearch<PointT>::VoxelSearch(float voxel_size, float mini_voxel_size, int mini_grid_size)
+        : VoxelHashing<PointT>(voxel_size, mini_voxel_size, mini_grid_size) {}
 
-    template <typename PointT, std::size_t mini_grid_size>
-    std::tuple<int, int, int> ArraySearch<PointT, mini_grid_size>::adjustIndices(
+    template <typename PointT>
+    std::tuple<int, int, int> VoxelSearch<PointT>::adjustIndices(
         int x, int y, int z, std::tuple<int, int, int>& voxel_index) const {
 
         if (x < 0) {
             --std::get<0>(voxel_index);
-            x += mini_grid_size;
+            x += this->mini_grid_size_;
         }
-        else if (x >= mini_grid_size) {
+        else if (x >= this->mini_grid_size_) {
             ++std::get<0>(voxel_index);
-            x -= mini_grid_size;
+            x -= this->mini_grid_size_;
         }
 
         if (y < 0) {
             --std::get<1>(voxel_index);
-            y += mini_grid_size;
+            y += this->mini_grid_size_;
         }
-        else if (y >= mini_grid_size) {
+        else if (y >= this->mini_grid_size_) {
             ++std::get<1>(voxel_index);
-            y -= mini_grid_size;
+            y -= this->mini_grid_size_;
         }
 
         if (z < 0) {
             --std::get<2>(voxel_index);
-            z += mini_grid_size;
+            z += this->mini_grid_size_;
         }
-        else if (z >= mini_grid_size) {
+        else if (z >= this->mini_grid_size_) {
             ++std::get<2>(voxel_index);
-            z -= mini_grid_size;
+            z -= this->mini_grid_size_;
         }
 
         return { x, y, z };
     }
 
-    template <typename PointT, std::size_t mini_grid_size>
-    std::vector<PointT> ArraySearch<PointT, mini_grid_size>::findKNearestNeighbors(
+    template <typename PointT>
+    std::vector<PointT> VoxelSearch<PointT>::findKNearestNeighbors(
         const PointT& query_point, int k, float max_distance) const {
 
         using Neighbor = std::pair<float, PointT>;
@@ -72,7 +72,11 @@ namespace voxelStruct {
                     auto voxel_it = this->voxel_map_.find(neighbor_voxel_index);
                     if (voxel_it == this->voxel_map_.end()) continue;
 
-                    const auto& points = (*voxel_it->second)[nx][ny][nz];
+                    const auto& mini_voxel_map = voxel_it->second;
+                    auto mini_voxel_it = mini_voxel_map.find({ nx, ny, nz });
+                    if (mini_voxel_it == mini_voxel_map.end()) continue;
+
+                    const auto& points = mini_voxel_it->second;
                     for (const auto& point : points) {
                         float distance = std::sqrt(
                             std::pow(query_point.x - point.x, 2) +
@@ -104,8 +108,8 @@ namespace voxelStruct {
         return result;
     }
 
-    template <typename PointT, std::size_t mini_grid_size>
-    std::vector<PointT> ArraySearch<PointT, mini_grid_size>::findAllPointsWithinRadius(
+    template <typename PointT>
+    std::vector<PointT> VoxelSearch<PointT>::findAllPointsWithinRadius(
         const PointT& query_point, float max_distance) const {
 
         std::vector<PointT> result;
@@ -127,7 +131,11 @@ namespace voxelStruct {
                     auto voxel_it = this->voxel_map_.find(neighbor_voxel_index);
                     if (voxel_it == this->voxel_map_.end()) continue;
 
-                    const auto& points = (*voxel_it->second)[nx][ny][nz];
+                    const auto& mini_voxel_map = voxel_it->second;
+                    auto mini_voxel_it = mini_voxel_map.find({ nx, ny, nz });
+                    if (mini_voxel_it == mini_voxel_map.end()) continue;
+
+                    const auto& points = mini_voxel_it->second;
                     for (const auto& point : points) {
                         float distance = std::sqrt(
                             std::pow(query_point.x - point.x, 2) +
@@ -146,6 +154,6 @@ namespace voxelStruct {
         return result;
     }
 
-} // namespace voxelStruct
+} 
 
-#endif // ARRAY_SEARCH_HPP
+#endif 

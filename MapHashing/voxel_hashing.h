@@ -46,6 +46,6 @@ namespace voxelStruct {
 
 }
 
-#include "voxel_hashing.hpp"
+#include "impl/voxel_hashing.hpp"
 
 #endif

@@ -1,7 +1,7 @@
 #ifndef VOXEL_HASHING_ARRAY_HPP
 #define VOXEL_HASHING_ARRAY_HPP
 
-#include "voxel_hashing_array.h"
+#include "../voxel_hashing_array.h"
 
 namespace voxelStruct {
 

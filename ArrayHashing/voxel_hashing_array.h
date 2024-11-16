@@ -39,6 +39,6 @@ namespace voxelStruct {
 
 }
 
-#include "voxel_hashing_array.hpp"  
+#include "impl/voxel_hashing_array.hpp"  
 
 #endif

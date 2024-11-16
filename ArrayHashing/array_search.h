@@ -25,6 +25,6 @@ namespace voxelStruct {
 
 }
 
-#include "array_search.hpp"
+#include "impl/array_search.hpp"
 
-#endif // ARRAY_SEARCH_H
+#endif 

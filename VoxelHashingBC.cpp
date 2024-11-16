@@ -1,53 +1,5 @@
-﻿/*
-#include <iostream>
-#include <pcl/io/ply_io.h>
-#include <pcl/point_types.h>
-#include <pcl/point_cloud.h>
-#include "voxel_hashing.h"
-
-int main() {
-    
-    std::string file_path = "C:\\test.ply";
-
-    
-    pcl::PointCloud<pcl::PointXYZ>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZ>);
-    if (pcl::io::loadPLYFile(file_path, *cloud) == -1) {
-        std::cerr << "Error loading file " << file_path << std::endl;
-        return -1;
-    }
-
-    std::cout << "Loaded " << cloud->points.size() << " points." << std::endl;
-
-    
-    float voxel_size = 0.1f;
-    float mini_voxel_size = 0.05f;
-    int mini_grid_size = 10;
-    voxelStruct::VoxelHashing<pcl::PointXYZ> voxelHashing(voxel_size, mini_voxel_size, mini_grid_size);
-
-    
-    for (const auto& point : cloud->points) {
-        voxelHashing.addPoint(point);
-    }
-
-    std::cout << "All points have been added to the VoxelHashing structure." << std::endl;
-
-   
-    for (const auto& voxel_pair : voxelHashing.voxel_map_) {
-        const auto& voxel_index = voxel_pair.first;
-        const auto& mini_voxel_map = voxel_pair.second;
-
-        int point_count = 0;
-        for (const auto& mini_voxel_pair : mini_voxel_map) {
-            point_count += mini_voxel_pair.second.size();
-        }
-
-        std::cout << "Voxel (" << std::get<0>(voxel_index) << ", " << std::get<1>(voxel_index) << ", " << std::get<2>(voxel_index) << ") has " << point_count << " points." << std::endl;
-    }
-
-    return 0;
-}
-*/
-#include <iostream>
+﻿
+/*#include <iostream>
 #include <pcl/io/ply_io.h>
 #include <pcl/point_types.h>
 #include <pcl/point_cloud.h>
@@ -116,13 +68,14 @@ int main() {
     return 0;
 }
 
+*/
 /*
 #include <iostream>
 #include <pcl/io/ply_io.h>
 #include <pcl/point_types.h>
 #include <pcl/point_cloud.h>
-#include "voxel_hashing.h"
-#include "voxel_search.h"  // Подключаем новый файл для поиска соседей
+#include "MapHashing/voxel_hashing.h"
+#include "MapHashing/voxel_search.h"  
 
 int main() {
     // Указываем путь к файлу с облаком точек
@@ -139,7 +92,7 @@ int main() {
     std::cout << "Loaded " << cloud->points.size() << " points." << std::endl;
 
     // Задаем параметры для VoxelHashing
-    float voxel_size = 0.1f;
+    float voxel_size = 0.5f;
     float mini_voxel_size = 0.05f;
     int mini_grid_size = 10;
 
@@ -153,19 +106,91 @@ int main() {
 
     std::cout << "All points have been added to the VoxelSearch structure." << std::endl;
 
-    // Пример поиска соседей для первой точки в облаке
+    // Пример поиска k ближайших соседей для первой точки в облаке
     if (!cloud->points.empty()) {
         pcl::PointXYZ query_point = cloud->points[0];
-        auto neighbors = voxelSearch.findNeighborPoints(query_point, 1);  // Ищем соседей на расстоянии 1
+        int k = 5;
+        float max_distance = 0.5f;
 
-        std::cout << "Found " << neighbors.size() << " neighbors for the first point." << std::endl;
+        // Ищем k ближайших соседей
+        auto neighbors_k_nearest = voxelSearch.findKNearestNeighbors(query_point, k, max_distance);
+        std::cout << "Found " << neighbors_k_nearest.size() << " nearest neighbors for the first point." << std::endl;
 
-        // Выводим соседние точки
-        for (const auto& neighbor : neighbors) {
-            std::cout << "Neighbor point: (" << neighbor.x << ", " << neighbor.y << ", " << neighbor.z << ")" << std::endl;
+        // Выводим найденные точки
+        for (const auto& neighbor : neighbors_k_nearest) {
+            std::cout << "Nearest neighbor point: (" << neighbor.x << ", " << neighbor.y << ", " << neighbor.z << ")" << std::endl;
+        }
+
+        // Пример поиска всех соседей в радиусе
+        auto neighbors_within_radius = voxelSearch.findAllPointsWithinRadius(query_point, max_distance);
+        std::cout << "Found " << neighbors_within_radius.size() << " neighbors within radius " << max_distance << " for the first point." << std::endl;
+
+        // Выводим найденные точки
+        for (const auto& neighbor : neighbors_within_radius) {
+            std::cout << "Neighbor within radius: (" << neighbor.x << ", " << neighbor.y << ", " << neighbor.z << ")" << std::endl;
         }
     }
 
     return 0;
 }
 */
+#include <iostream>
+#include <pcl/point_types.h>
+#include <pcl/point_cloud.h>
+#include "ArrayHashing/voxel_index_array.h"
+#include "ArrayHashing/voxel_center_array.h"
+#include "ArrayHashing/voxel_mid_point_array.h"
+
+int main() {
+    // Создаем точки для теста
+    pcl::PointCloud<pcl::PointXYZ>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZ>);
+    cloud->push_back(pcl::PointXYZ(0.1, 0.1, 0.1));
+    cloud->push_back(pcl::PointXYZ(0.2, 0.2, 0.2));
+    cloud->push_back(pcl::PointXYZ(0.8, 0.8, 0.8));
+    cloud->push_back(pcl::PointXYZ(0.5, 0.5, 0.5));
+    cloud->push_back(pcl::PointXYZ(1.1, 1.1, 1.1));
+
+    // Задаем параметры для теста
+    float voxel_size = 1.0f;
+    float mini_voxel_size = 0.5f;
+    constexpr std::size_t mini_grid_size = 2;
+
+    // --- Тестируем VoxelIndexArray ---
+    voxelStruct::VoxelIndexArray<pcl::PointXYZ, mini_grid_size> voxelIndexArray(voxel_size, mini_voxel_size);
+
+    for (const auto& point : cloud->points) {
+        voxelIndexArray.addPoint(point);
+    }
+
+    auto voxel_index = std::make_tuple(0, 0, 0);
+    auto mini_voxel_index = std::make_tuple(0, 0, 0);
+
+    std::cout << "VoxelIndexArray - :" << std::endl;
+    for (const auto& index : voxelIndexArray.getIndicesInMiniVoxel(voxel_index, mini_voxel_index)) {
+        std::cout << "Point index: (" << std::get<0>(index) << ", " << std::get<1>(index) << ", " << std::get<2>(index) << ")" << std::endl;
+    }
+
+    // --- Тестируем VoxelCenterArray ---
+    voxelStruct::VoxelCenterArray<pcl::PointXYZ, mini_grid_size> voxelCenterArray(voxel_size, mini_voxel_size);
+
+    for (const auto& point : cloud->points) {
+        voxelCenterArray.addPoint(point);
+    }
+
+    std::cout << "\nVoxelCenterArray" << std::endl;
+    auto center = voxelCenterArray.getCenterInMiniVoxel(voxel_index, mini_voxel_index);
+    std::cout << "Center: (" << center.x << ", " << center.y << ", " << center.z << ")" << std::endl;
+
+    // --- Тестируем VoxelMidPointArray ---
+    voxelStruct::VoxelMidPointArray<pcl::PointXYZ, mini_grid_size> voxelMidPointArray(voxel_size, mini_voxel_size);
+
+    for (const auto& point : cloud->points) {
+        voxelMidPointArray.addPoint(point);
+    }
+
+    std::cout << "\nVoxelMidPointArray " << std::endl;
+    auto mid_point = voxelMidPointArray.getMidPointInMiniVoxel(voxel_index, mini_voxel_index);
+    std::cout << "Midpoint: (" << mid_point.x << ", " << mid_point.y << ", " << mid_point.z << ")" << std::endl;
+
+    return 0;
+}

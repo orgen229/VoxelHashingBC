@@ -135,13 +135,25 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ArrayHashing\array_search.h" />
-    <ClInclude Include="ArrayHashing\array_search.hpp" />
+    <ClInclude Include="ArrayHashing\impl\array_search.hpp" />
+    <ClInclude Include="ArrayHashing\impl\voxel_center_array.hpp" />
+    <ClInclude Include="ArrayHashing\impl\voxel_hashing_array.hpp" />
+    <ClInclude Include="ArrayHashing\impl\voxel_index_array.hpp" />
+    <ClInclude Include="ArrayHashing\impl\voxel_mid_point_array.hpp" />
+    <ClInclude Include="ArrayHashing\voxel_center_array.h" />
     <ClInclude Include="ArrayHashing\voxel_hashing_array.h" />
-    <ClInclude Include="ArrayHashing\voxel_hashing_array.hpp" />
+    <ClInclude Include="ArrayHashing\voxel_index_array.h" />
+    <ClInclude Include="ArrayHashing\voxel_mid_point_array.h" />
+    <ClInclude Include="MapHashing\impl\voxel_center_only.hpp" />
+    <ClInclude Include="MapHashing\impl\voxel_hashing.hpp" />
+    <ClInclude Include="MapHashing\impl\voxel_index_only.hpp" />
+    <ClInclude Include="MapHashing\impl\voxel_mid_point.hpp" />
+    <ClInclude Include="MapHashing\impl\voxel_search.hpp" />
+    <ClInclude Include="MapHashing\voxel_center_only.h" />
     <ClInclude Include="MapHashing\voxel_hashing.h" />
-    <ClInclude Include="MapHashing\voxel_hashing.hpp" />
+    <ClInclude Include="MapHashing\voxel_index_only.h" />
+    <ClInclude Include="MapHashing\voxel_mid_point.h" />
     <ClInclude Include="MapHashing\voxel_search.h" />
-    <ClInclude Include="MapHashing\voxel_search.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

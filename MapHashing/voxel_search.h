@@ -3,21 +3,28 @@
 
 #include "voxel_hashing.h"
 #include <vector>
+#include <tuple>
+#include <queue>
+#include <cmath>
+#include <algorithm>
 
 namespace voxelStruct {
 
     template <typename PointT>
     class VoxelSearch : public VoxelHashing<PointT> {
     public:
-        using VoxelHashing<PointT>::VoxelHashing;
+        VoxelSearch(float voxel_size, float mini_voxel_size, int mini_grid_size);
 
-        
-        std::vector<PointT> findNeighborPoints(const PointT& point, int neighbor_distance = 1);
-        PointT findNearestPoint(const PointT& point);
+        std::vector<PointT> findKNearestNeighbors(const PointT& query_point, int k, float max_distance) const;
+        std::vector<PointT> findAllPointsWithinRadius(const PointT& query_point, float max_distance) const;
+
+    private:
+        std::tuple<int, int, int> adjustIndices(
+            int x, int y, int z, std::tuple<int, int, int>& voxel_index) const;
     };
 
-} 
+}
 
-#include "voxel_search.hpp"
+#include "impl/voxel_search.hpp"
 
 #endif 
