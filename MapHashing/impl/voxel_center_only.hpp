@@ -13,15 +13,15 @@ namespace voxelStruct {
     void VoxelCenterOnly<PointT>::addPoint(const PointT& point) {
         auto voxel_index = this->getVoxelIndex(point);
 
-        
+       
         if (center_map_.find(voxel_index) == center_map_.end()) {
             center_map_[voxel_index] = {};
         }
 
         auto mini_voxel_index = this->getMiniVoxelIndex(point, voxel_index);
 
+       
         if (center_map_[voxel_index].find(mini_voxel_index) == center_map_[voxel_index].end()) {
-            
             PointT center;
             center.x = (std::get<0>(mini_voxel_index) + 0.5f) * this->mini_voxel_size_;
             center.y = (std::get<1>(mini_voxel_index) + 0.5f) * this->mini_voxel_size_;
@@ -42,7 +42,7 @@ namespace voxelStruct {
                 return mini_it->second;
             }
         }
-        return PointT();
+        return PointT(); 
     }
 
 }

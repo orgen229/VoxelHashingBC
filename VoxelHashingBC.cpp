@@ -140,9 +140,10 @@ int main() {
 #include "ArrayHashing/voxel_index_array.h"
 #include "ArrayHashing/voxel_center_array.h"
 #include "ArrayHashing/voxel_mid_point_array.h"
+#include "MapHashing/voxel_index_only.h"
 
 int main() {
-    // Создаем точки для теста
+    // Создаем облако точек
     pcl::PointCloud<pcl::PointXYZ>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZ>);
     cloud->push_back(pcl::PointXYZ(0.1, 0.1, 0.1));
     cloud->push_back(pcl::PointXYZ(0.2, 0.2, 0.2));
@@ -150,47 +151,28 @@ int main() {
     cloud->push_back(pcl::PointXYZ(0.5, 0.5, 0.5));
     cloud->push_back(pcl::PointXYZ(1.1, 1.1, 1.1));
 
-    // Задаем параметры для теста
+    // Параметры для VoxelIndexOnly
     float voxel_size = 1.0f;
     float mini_voxel_size = 0.5f;
-    constexpr std::size_t mini_grid_size = 2;
+    int mini_grid_size = 2;
 
-    // --- Тестируем VoxelIndexArray ---
-    voxelStruct::VoxelIndexArray<pcl::PointXYZ, mini_grid_size> voxelIndexArray(voxel_size, mini_voxel_size);
+    // Создаем объект VoxelIndexOnly
+    voxelStruct::VoxelIndexOnly<pcl::PointXYZ> voxelIndexOnly(voxel_size, mini_voxel_size, mini_grid_size);
 
+    // Добавляем точки в структуру
     for (const auto& point : cloud->points) {
-        voxelIndexArray.addPoint(point);
+        voxelIndexOnly.addPoint(point);
     }
 
+    // Получаем индексы точек для конкретного мини-вокселя
     auto voxel_index = std::make_tuple(0, 0, 0);
     auto mini_voxel_index = std::make_tuple(0, 0, 0);
 
-    std::cout << "VoxelIndexArray - :" << std::endl;
-    for (const auto& index : voxelIndexArray.getIndicesInMiniVoxel(voxel_index, mini_voxel_index)) {
-        std::cout << "Point index: (" << std::get<0>(index) << ", " << std::get<1>(index) << ", " << std::get<2>(index) << ")" << std::endl;
+    std::cout << "VoxelIndexOnly - Индексы точек в мини-вокселе:" << std::endl;
+    auto indices = voxelIndexOnly.getIndicesInMiniVoxel(voxel_index, mini_voxel_index);
+    for (const auto& index : indices) {
+        std::cout << "Point index: " << index << std::endl;
     }
-
-    // --- Тестируем VoxelCenterArray ---
-    voxelStruct::VoxelCenterArray<pcl::PointXYZ, mini_grid_size> voxelCenterArray(voxel_size, mini_voxel_size);
-
-    for (const auto& point : cloud->points) {
-        voxelCenterArray.addPoint(point);
-    }
-
-    std::cout << "\nVoxelCenterArray" << std::endl;
-    auto center = voxelCenterArray.getCenterInMiniVoxel(voxel_index, mini_voxel_index);
-    std::cout << "Center: (" << center.x << ", " << center.y << ", " << center.z << ")" << std::endl;
-
-    // --- Тестируем VoxelMidPointArray ---
-    voxelStruct::VoxelMidPointArray<pcl::PointXYZ, mini_grid_size> voxelMidPointArray(voxel_size, mini_voxel_size);
-
-    for (const auto& point : cloud->points) {
-        voxelMidPointArray.addPoint(point);
-    }
-
-    std::cout << "\nVoxelMidPointArray " << std::endl;
-    auto mid_point = voxelMidPointArray.getMidPointInMiniVoxel(voxel_index, mini_voxel_index);
-    std::cout << "Midpoint: (" << mid_point.x << ", " << mid_point.y << ", " << mid_point.z << ")" << std::endl;
 
     return 0;
 }

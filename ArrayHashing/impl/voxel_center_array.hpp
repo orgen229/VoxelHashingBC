@@ -13,20 +13,24 @@ namespace voxelStruct {
     void VoxelCenterArray<PointT, mini_grid_size>::addPoint(const PointT& point) {
         auto voxel_index = this->getVoxelIndex(point);
 
+   
         if (center_map_.find(voxel_index) == center_map_.end()) {
             center_map_[voxel_index] = std::make_shared<std::array<std::array<std::array<PointT, mini_grid_size>, mini_grid_size>, mini_grid_size>>();
         }
 
         auto mini_voxel_index = this->getMiniVoxelIndex(point, voxel_index);
 
-        if ((*center_map_[voxel_index])[std::get<0>(mini_voxel_index)][std::get<1>(mini_voxel_index)][std::get<2>(mini_voxel_index)].x == 0 &&
-            (*center_map_[voxel_index])[std::get<0>(mini_voxel_index)][std::get<1>(mini_voxel_index)][std::get<2>(mini_voxel_index)].y == 0 &&
-            (*center_map_[voxel_index])[std::get<0>(mini_voxel_index)][std::get<1>(mini_voxel_index)][std::get<2>(mini_voxel_index)].z == 0) {
-            PointT center;
-            center.x = (std::get<0>(mini_voxel_index) + 0.5f) * this->mini_voxel_size_;
-            center.y = (std::get<1>(mini_voxel_index) + 0.5f) * this->mini_voxel_size_;
-            center.z = (std::get<2>(mini_voxel_index) + 0.5f) * this->mini_voxel_size_;
-            (*center_map_[voxel_index])[std::get<0>(mini_voxel_index)][std::get<1>(mini_voxel_index)][std::get<2>(mini_voxel_index)] = center;
+        int mini_x = std::get<0>(mini_voxel_index);
+        int mini_y = std::get<1>(mini_voxel_index);
+        int mini_z = std::get<2>(mini_voxel_index);
+
+        
+        PointT& center = (*center_map_[voxel_index])[mini_x][mini_y][mini_z];
+
+        if (center.x == 0 && center.y == 0 && center.z == 0) { 
+            center.x = (mini_x + 0.5f) * this->mini_voxel_size_;
+            center.y = (mini_y + 0.5f) * this->mini_voxel_size_;
+            center.z = (mini_z + 0.5f) * this->mini_voxel_size_;
         }
     }
 
@@ -37,11 +41,16 @@ namespace voxelStruct {
 
         auto voxel_it = center_map_.find(voxel_index);
         if (voxel_it != center_map_.end()) {
-            return (*voxel_it->second)[std::get<0>(mini_voxel_index)][std::get<1>(mini_voxel_index)][std::get<2>(mini_voxel_index)];
+            int mini_x = std::get<0>(mini_voxel_index);
+            int mini_y = std::get<1>(mini_voxel_index);
+            int mini_z = std::get<2>(mini_voxel_index);
+
+            return (*voxel_it->second)[mini_x][mini_y][mini_z];
         }
-        return PointT();
+
+        return PointT(); 
     }
 
 }
 
-#endif 
+#endif

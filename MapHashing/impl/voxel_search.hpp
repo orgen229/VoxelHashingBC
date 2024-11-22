@@ -84,7 +84,7 @@ namespace voxelStruct {
                             std::pow(query_point.z - point.z, 2)
                         );
 
-                        if (distance <= max_distance) {
+                        if (distance > 0 && distance <= max_distance) {
                             if (neighbors.size() < k) {
                                 neighbors.emplace(distance, point);
                             }
@@ -143,7 +143,7 @@ namespace voxelStruct {
                             std::pow(query_point.z - point.z, 2)
                         );
 
-                        if (distance <= max_distance) {
+                        if (distance > 0 && distance <= max_distance) {
                             result.push_back(point);
                         }
                     }

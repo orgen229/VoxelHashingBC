@@ -20,11 +20,11 @@ namespace voxelStruct {
             std::tuple<int, int, int>,
             std::unordered_map<std::tuple<int, int, int>, PointT, VoxelHash>,
             VoxelHash
-        > center_map_;
+        > center_map_; 
     };
 
 }
 
 #include "impl/voxel_center_only.hpp"
 
-#endif 
+#endif
