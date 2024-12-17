@@ -1,178 +1,127 @@
-﻿
-/*#include <iostream>
+﻿/*
+#include <iostream>
 #include <pcl/io/ply_io.h>
 #include <pcl/point_types.h>
 #include <pcl/point_cloud.h>
 #include <cassert>
-#include <omp.h> 
+#include <omp.h>
 #include "ArrayHashing/voxel_hashing_array.h"
-#include "ArrayHashing/array_search.h"  // Подключаем ArraySearch
+#include "ArrayHashing/array_search.h"  
+
+
+using namespace voxelStruct;
 
 int main() {
+    // Point type
+    using PointT = pcl::PointXYZ;
+
+    // Grid parameters
+    constexpr std::size_t mini_grid_size = 4; // Mini-grid size
+    float voxel_size = 1.0f;                  // Voxel size
+    float mini_voxel_size = 0.25f;            // Mini-voxel size
+
+    // Initialize the voxel hashing class
+    VoxelHashingArray<PointT, mini_grid_size> voxel_hashing(voxel_size, mini_voxel_size);
+
+    // Path to the PLY file
     std::string file_path = "C:\\test.ply";
 
-    // Загрузка облака точек
-    pcl::PointCloud<pcl::PointXYZ>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZ>);
+    // Load point cloud from file
+    pcl::PointCloud<PointT>::Ptr cloud(new pcl::PointCloud<PointT>());
     if (pcl::io::loadPLYFile(file_path, *cloud) == -1) {
-        std::cerr << "Error loading file " << file_path << std::endl;
+        std::cerr << "Error: Could not load file: " << file_path << std::endl;
         return -1;
     }
 
-    std::cout << "Loaded " << cloud->points.size() << " points from file." << std::endl;
+    std::cout << "Successfully loaded " << cloud->size() << " points from file." << std::endl;
 
-    // Проверка наличия точек в облаке
-    if (cloud->points.empty()) {
-        std::cerr << "The point cloud is empty." << std::endl;
-        return -1;
-    }
+    // Add points to the voxel structure
+    std::size_t point_count = 0; // Счётчик добавленных точек
+    for (const auto& point : cloud->points) {
+        voxel_hashing.addPoint(point);
+        point_count++;
 
-    // Параметры вокселей
-    float voxel_size = 0.5f;
-    float mini_voxel_size = voxel_size / 10;
-    constexpr std::size_t mini_grid_size = 10;
-
-    // Инициализация массива вокселей
-    voxelStruct::ArraySearch<pcl::PointXYZ, mini_grid_size> voxelHashingArray(voxel_size, mini_voxel_size);
-
-    // Обработка точек облака
-    std::size_t num_points = cloud->points.size();
-    int progress_step = 100000;
-
-#pragma omp parallel for
-    for (std::size_t i = 0; i < num_points; ++i) {
-        voxelHashingArray.addPoint(cloud->points[i]);
-        if (i % progress_step == 0) {
-#pragma omp critical
-            std::cout << "Progress: " << i << " points processed." << std::endl;
+        // Вывод каждые 100,000 точек
+        if (point_count % 100000 == 0) {
+            std::cout << point_count << " points have been added to the voxel structure." << std::endl;
         }
     }
 
-    std::cout << "All points have been added to the VoxelHashingArray structure." << std::endl;
+    std::cout << "All " << point_count << " points have been added to the voxel structure." << std::endl;
 
+    // Получаем индекс вокселя для первой точки
+    if (!cloud->points.empty()) {
+        const PointT& first_point = cloud->points[0];
+        auto voxel_index = voxel_hashing.getVoxelIndex(first_point);
 
-    // Используем первую точку из облака точек как query_point
-    pcl::PointXYZ query_point = cloud->points[0];
-    int k = 5;  // Количество ближайших соседей
-    float max_distance = 0.5f;  // Максимальное расстояние для поиска соседей
+        // Извлекаем все точки из этого вокселя
+        auto points_in_voxel = voxel_hashing.selectAllPointsFromVoxel(voxel_index);
 
-    // Находим ближайшие соседи к query_point
-    std::vector<pcl::PointXYZ> neighbors = voxelHashingArray.findAllPointsWithinRadius(query_point, max_distance);
+        std::cout << "The voxel containing the first point ("
+            << first_point.x << ", " << first_point.y << ", " << first_point.z
+            << ") has " << points_in_voxel.size() << " points." << std::endl;
 
-    // Выводим найденные соседние точки
-    std::cout << "Found " << neighbors.size() << " neighbors for the query point ("
-        << query_point.x << ", " << query_point.y << ", " << query_point.z << "):" << std::endl;
-    for (const auto& neighbor : neighbors) {
-        std::cout << "(" << neighbor.x << ", " << neighbor.y << ", " << neighbor.z << ")" << std::endl;
+        // Вывод всех точек из вокселя
+        for (const auto& point : points_in_voxel) {
+            std::cout << "Point: (" << point.x << ", " << point.y << ", " << point.z << ")" << std::endl;
+        }
+    }
+    else {
+        std::cout << "The point cloud is empty!" << std::endl;
     }
 
     return 0;
-}
+}*/
 
-*/
-/*
+
 #include <iostream>
 #include <pcl/io/ply_io.h>
 #include <pcl/point_types.h>
-#include <pcl/point_cloud.h>
-#include "MapHashing/voxel_hashing.h"
-#include "MapHashing/voxel_search.h"  
+#include "ArrayHashing/tsdf_voxel_hashing_array.h" 
 
-int main() {
-    // Указываем путь к файлу с облаком точек
-    std::string file_path = "C:\\test.ply";
-
-    // Загружаем облако точек
-    pcl::PointCloud<pcl::PointXYZ>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZ>);
-    if (pcl::io::loadPLYFile(file_path, *cloud) == -1) {
-        std::cerr << "Error loading file " << file_path << std::endl;
+int main(int argc, char** argv) {
+    // Load the point cloud using PCL
+    pcl::PointCloud<pcl::PointXYZ>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZ>());
+    if (pcl::io::loadPLYFile<pcl::PointXYZ>("C:\\test2.ply", *cloud) == -1) {
+        std::cerr << "Could not load file C:\\test2.ply" << std::endl;
         return -1;
     }
 
-    // Выводим количество загруженных точек
     std::cout << "Loaded " << cloud->points.size() << " points." << std::endl;
 
-    // Задаем параметры для VoxelHashing
-    float voxel_size = 0.5f;
-    float mini_voxel_size = 0.05f;
-    int mini_grid_size = 10;
-
-    // Создаем объект VoxelSearch (наследник VoxelHashing)
-    voxelStruct::VoxelSearch<pcl::PointXYZ> voxelSearch(voxel_size, mini_voxel_size, mini_grid_size);
-
-    // Добавляем все точки из облака в структуру VoxelSearch
-    for (const auto& point : cloud->points) {
-        voxelSearch.addPoint(point);
+    if (cloud->points.empty()) {
+        std::cerr << "The cloud is empty." << std::endl;
+        return -1;
     }
 
-    std::cout << "All points have been added to the VoxelSearch structure." << std::endl;
+    // TSDF and grid parameters
+    const float voxel_size = 0.05f;
+    const float truncation_distance = 0.1f;
+    const std::size_t mini_grid_size = 4;
 
-    // Пример поиска k ближайших соседей для первой точки в облаке
-    if (!cloud->points.empty()) {
-        pcl::PointXYZ query_point = cloud->points[0];
-        int k = 5;
-        float max_distance = 0.5f;
+    // Create TSDFVoxelHashingArray with pcl::PointXYZ
+    voxelStruct::TSDFVoxelHashingArray<pcl::PointXYZ, mini_grid_size> tsdf(
+        voxel_size, voxel_size / (float)mini_grid_size, truncation_distance
+    );
 
-        // Ищем k ближайших соседей
-        auto neighbors_k_nearest = voxelSearch.findKNearestNeighbors(query_point, k, max_distance);
-        std::cout << "Found " << neighbors_k_nearest.size() << " nearest neighbors for the first point." << std::endl;
-
-        // Выводим найденные точки
-        for (const auto& neighbor : neighbors_k_nearest) {
-            std::cout << "Nearest neighbor point: (" << neighbor.x << ", " << neighbor.y << ", " << neighbor.z << ")" << std::endl;
-        }
-
-        // Пример поиска всех соседей в радиусе
-        auto neighbors_within_radius = voxelSearch.findAllPointsWithinRadius(query_point, max_distance);
-        std::cout << "Found " << neighbors_within_radius.size() << " neighbors within radius " << max_distance << " for the first point." << std::endl;
-
-        // Выводим найденные точки
-        for (const auto& neighbor : neighbors_within_radius) {
-            std::cout << "Neighbor within radius: (" << neighbor.x << ", " << neighbor.y << ", " << neighbor.z << ")" << std::endl;
-        }
+    // Integrate the point cloud into TSDF
+    for (const auto& p : cloud->points) {
+        tsdf.integratePoint(p, 1.0f); // weight = 1.0
     }
 
-    return 0;
-}
-*/
-#include <iostream>
-#include <pcl/point_types.h>
-#include <pcl/point_cloud.h>
-#include "ArrayHashing/voxel_index_array.h"
-#include "ArrayHashing/voxel_center_array.h"
-#include "ArrayHashing/voxel_mid_point_array.h"
-#include "MapHashing/voxel_index_only.h"
+    // Use the first point from the cloud as the query point
+    pcl::PointXYZ query_point = cloud->points.front();
 
-int main() {
-    // Создаем облако точек
-    pcl::PointCloud<pcl::PointXYZ>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZ>);
-    cloud->push_back(pcl::PointXYZ(0.1, 0.1, 0.1));
-    cloud->push_back(pcl::PointXYZ(0.2, 0.2, 0.2));
-    cloud->push_back(pcl::PointXYZ(0.8, 0.8, 0.8));
-    cloud->push_back(pcl::PointXYZ(0.5, 0.5, 0.5));
-    cloud->push_back(pcl::PointXYZ(1.1, 1.1, 1.1));
+    // Query TSDF value at the query_point
+    float tsdf_value = tsdf.getTSDFValueAt(query_point);
+    std::cout << "TSDF value at (" << query_point.x << "," << query_point.y << "," << query_point.z << "): " << tsdf_value << std::endl;
 
-    // Параметры для VoxelIndexOnly
-    float voxel_size = 1.0f;
-    float mini_voxel_size = 0.5f;
-    int mini_grid_size = 2;
-
-    // Создаем объект VoxelIndexOnly
-    voxelStruct::VoxelIndexOnly<pcl::PointXYZ> voxelIndexOnly(voxel_size, mini_voxel_size, mini_grid_size);
-
-    // Добавляем точки в структуру
-    for (const auto& point : cloud->points) {
-        voxelIndexOnly.addPoint(point);
-    }
-
-    // Получаем индексы точек для конкретного мини-вокселя
-    auto voxel_index = std::make_tuple(0, 0, 0);
-    auto mini_voxel_index = std::make_tuple(0, 0, 0);
-
-    std::cout << "VoxelIndexOnly - Индексы точек в мини-вокселе:" << std::endl;
-    auto indices = voxelIndexOnly.getIndicesInMiniVoxel(voxel_index, mini_voxel_index);
-    for (const auto& index : indices) {
-        std::cout << "Point index: " << index << std::endl;
-    }
+    // Find the closest measured point to query_point
+    pcl::PointXYZ closest_point = tsdf.getClosestMeasuredPoint(query_point);
+    std::cout << "Closest measured point to (" << query_point.x << "," << query_point.y << "," << query_point.z << "): ("
+        << closest_point.x << ", "
+        << closest_point.y << ", "
+        << closest_point.z << ")" << std::endl;
 
     return 0;
 }

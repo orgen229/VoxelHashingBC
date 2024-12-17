@@ -7,12 +7,15 @@
 #include <queue>
 #include <cmath>
 #include <algorithm>
+#include <type_traits>
 
 namespace voxelStruct {
 
-    template <typename PointT, std::size_t mini_grid_size>
-    class ArraySearch : public VoxelHashingArray<PointT, mini_grid_size> {
+    template <typename PointT, std::size_t mini_grid_size, typename BaseClass = VoxelHashingArray<PointT, mini_grid_size>>
+    class ArraySearch : public BaseClass {
     public:
+       // static_assert(!std::is_same<BaseClass, VoxelIndexArray<PointT, mini_grid_size>>::value, "ArraySearch does not support VoxelIndexArray as a base class.");
+
         ArraySearch(float voxel_size, float mini_voxel_size);
 
         std::vector<PointT> findKNearestNeighbors(const PointT& query_point, int k, float max_distance) const;
@@ -27,4 +30,4 @@ namespace voxelStruct {
 
 #include "impl/array_search.hpp"
 
-#endif 
+#endif

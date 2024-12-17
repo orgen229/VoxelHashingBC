@@ -5,12 +5,12 @@
 
 namespace voxelStruct {
 
-    template <typename PointT, std::size_t mini_grid_size>
-    ArraySearch<PointT, mini_grid_size>::ArraySearch(float voxel_size, float mini_voxel_size)
-        : VoxelHashingArray<PointT, mini_grid_size>(voxel_size, mini_voxel_size) {}
+    template <typename PointT, std::size_t mini_grid_size, typename BaseClass>
+    ArraySearch<PointT, mini_grid_size, BaseClass>::ArraySearch(float voxel_size, float mini_voxel_size)
+        : BaseClass(voxel_size, mini_voxel_size) {}
 
-    template <typename PointT, std::size_t mini_grid_size>
-    std::tuple<int, int, int> ArraySearch<PointT, mini_grid_size>::adjustIndices(
+    template <typename PointT, std::size_t mini_grid_size, typename BaseClass>
+    std::tuple<int, int, int> ArraySearch<PointT, mini_grid_size, BaseClass>::adjustIndices(
         int x, int y, int z, std::tuple<int, int, int>& voxel_index) const {
 
         if (x < 0) {
@@ -43,15 +43,13 @@ namespace voxelStruct {
         return { x, y, z };
     }
 
-    template <typename PointT, std::size_t mini_grid_size>
-    std::vector<PointT> ArraySearch<PointT, mini_grid_size>::findKNearestNeighbors(
+    template <typename PointT, std::size_t mini_grid_size, typename BaseClass>
+    std::vector<PointT> ArraySearch<PointT, mini_grid_size, BaseClass>::findKNearestNeighbors(
         const PointT& query_point, int k, float max_distance) const {
-
         using Neighbor = std::pair<float, PointT>;
-
         auto cmp = [](const Neighbor& left, const Neighbor& right) {
             return left.first > right.first;
-            };
+        };
 
         std::priority_queue<Neighbor, std::vector<Neighbor>, decltype(cmp)> neighbors{ cmp };
         auto voxel_index = this->getVoxelIndex(query_point);
@@ -83,8 +81,7 @@ namespace voxelStruct {
                         if (distance > 0 && distance <= max_distance) {
                             if (neighbors.size() < k) {
                                 neighbors.emplace(distance, point);
-                            }
-                            else if (distance < neighbors.top().first) {
+                            } else if (distance < neighbors.top().first) {
                                 neighbors.pop();
                                 neighbors.emplace(distance, point);
                             }
@@ -103,8 +100,8 @@ namespace voxelStruct {
         return result;
     }
 
-    template <typename PointT, std::size_t mini_grid_size>
-    std::vector<PointT> ArraySearch<PointT, mini_grid_size>::findAllPointsWithinRadius(
+    template <typename PointT, std::size_t mini_grid_size, typename BaseClass>
+    std::vector<PointT> ArraySearch<PointT, mini_grid_size, BaseClass>::findAllPointsWithinRadius(
         const PointT& query_point, float max_distance) const {
 
         std::vector<PointT> result;
@@ -147,4 +144,4 @@ namespace voxelStruct {
 
 } 
 
-#endif 
+#endif

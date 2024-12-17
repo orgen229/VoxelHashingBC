@@ -13,6 +13,18 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Файлы заголовков\array">
+      <UniqueIdentifier>{e708ebd7-917f-44aa-aa3f-1b1ba3990b76}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Файлы заголовков\tuple">
+      <UniqueIdentifier>{d96fb116-24e3-42b8-a4e1-a57a372f8b3e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Файлы заголовков\array\impl">
+      <UniqueIdentifier>{36a0543c-b25d-4827-a4c0-b6e588050171}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Файлы заголовков\tuple\impl">
+      <UniqueIdentifier>{050b4400-41f5-4d84-a3c1-84a8ec44870a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="VoxelHashingBC.cpp">
@@ -25,65 +37,71 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="MapHashing\voxel_hashing.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
-    <ClInclude Include="MapHashing\voxel_search.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
     <ClInclude Include="ArrayHashing\array_search.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
-    <ClInclude Include="ArrayHashing\voxel_hashing_array.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
-    <ClInclude Include="MapHashing\voxel_center_only.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
-    <ClInclude Include="MapHashing\voxel_index_only.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
-    <ClInclude Include="MapHashing\voxel_mid_point.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
-    <ClInclude Include="ArrayHashing\voxel_center_array.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
-    <ClInclude Include="ArrayHashing\voxel_index_array.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
-    <ClInclude Include="ArrayHashing\voxel_mid_point_array.h">
-      <Filter>Файлы заголовков</Filter>
+      <Filter>Файлы заголовков\array</Filter>
     </ClInclude>
     <ClInclude Include="ArrayHashing\impl\array_search.hpp">
-      <Filter>Файлы заголовков</Filter>
+      <Filter>Файлы заголовков\array\impl</Filter>
+    </ClInclude>
+    <ClInclude Include="ArrayHashing\voxel_center_array.h">
+      <Filter>Файлы заголовков\array</Filter>
     </ClInclude>
     <ClInclude Include="ArrayHashing\impl\voxel_center_array.hpp">
-      <Filter>Файлы заголовков</Filter>
+      <Filter>Файлы заголовков\array\impl</Filter>
     </ClInclude>
-    <ClInclude Include="ArrayHashing\impl\voxel_hashing_array.hpp">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
-    <ClInclude Include="ArrayHashing\impl\voxel_index_array.hpp">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
-    <ClInclude Include="ArrayHashing\impl\voxel_mid_point_array.hpp">
-      <Filter>Файлы заголовков</Filter>
+    <ClInclude Include="MapHashing\voxel_center_only.h">
+      <Filter>Файлы заголовков\tuple</Filter>
     </ClInclude>
     <ClInclude Include="MapHashing\impl\voxel_center_only.hpp">
-      <Filter>Файлы заголовков</Filter>
+      <Filter>Файлы заголовков\tuple\impl</Filter>
+    </ClInclude>
+    <ClInclude Include="MapHashing\voxel_hashing.h">
+      <Filter>Файлы заголовков\tuple</Filter>
     </ClInclude>
     <ClInclude Include="MapHashing\impl\voxel_hashing.hpp">
-      <Filter>Файлы заголовков</Filter>
+      <Filter>Файлы заголовков\tuple\impl</Filter>
+    </ClInclude>
+    <ClInclude Include="ArrayHashing\voxel_hashing_array.h">
+      <Filter>Файлы заголовков\array</Filter>
+    </ClInclude>
+    <ClInclude Include="ArrayHashing\impl\voxel_hashing_array.hpp">
+      <Filter>Файлы заголовков\array\impl</Filter>
+    </ClInclude>
+    <ClInclude Include="ArrayHashing\voxel_index_array.h">
+      <Filter>Файлы заголовков\array</Filter>
+    </ClInclude>
+    <ClInclude Include="ArrayHashing\impl\voxel_index_array.hpp">
+      <Filter>Файлы заголовков\array\impl</Filter>
+    </ClInclude>
+    <ClInclude Include="MapHashing\voxel_index_only.h">
+      <Filter>Файлы заголовков\tuple</Filter>
     </ClInclude>
     <ClInclude Include="MapHashing\impl\voxel_index_only.hpp">
-      <Filter>Файлы заголовков</Filter>
+      <Filter>Файлы заголовков\tuple\impl</Filter>
+    </ClInclude>
+    <ClInclude Include="MapHashing\voxel_mid_point.h">
+      <Filter>Файлы заголовков\tuple</Filter>
     </ClInclude>
     <ClInclude Include="MapHashing\impl\voxel_mid_point.hpp">
-      <Filter>Файлы заголовков</Filter>
+      <Filter>Файлы заголовков\tuple\impl</Filter>
+    </ClInclude>
+    <ClInclude Include="ArrayHashing\voxel_mid_point_array.h">
+      <Filter>Файлы заголовков\array</Filter>
+    </ClInclude>
+    <ClInclude Include="ArrayHashing\impl\voxel_mid_point_array.hpp">
+      <Filter>Файлы заголовков\array\impl</Filter>
+    </ClInclude>
+    <ClInclude Include="MapHashing\voxel_search.h">
+      <Filter>Файлы заголовков\tuple</Filter>
     </ClInclude>
     <ClInclude Include="MapHashing\impl\voxel_search.hpp">
-      <Filter>Файлы заголовков</Filter>
+      <Filter>Файлы заголовков\tuple\impl</Filter>
+    </ClInclude>
+    <ClInclude Include="ArrayHashing\impl\tsdf_voxel_hashing_array.hpp">
+      <Filter>Файлы заголовков\array\impl</Filter>
+    </ClInclude>
+    <ClInclude Include="ArrayHashing\tsdf_voxel_hashing_array.h">
+      <Filter>Файлы заголовков\array</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

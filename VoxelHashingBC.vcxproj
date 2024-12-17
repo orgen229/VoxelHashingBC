@@ -136,10 +136,12 @@
   <ItemGroup>
     <ClInclude Include="ArrayHashing\array_search.h" />
     <ClInclude Include="ArrayHashing\impl\array_search.hpp" />
+    <ClInclude Include="ArrayHashing\impl\tsdf_voxel_hashing_array.hpp" />
     <ClInclude Include="ArrayHashing\impl\voxel_center_array.hpp" />
     <ClInclude Include="ArrayHashing\impl\voxel_hashing_array.hpp" />
     <ClInclude Include="ArrayHashing\impl\voxel_index_array.hpp" />
     <ClInclude Include="ArrayHashing\impl\voxel_mid_point_array.hpp" />
+    <ClInclude Include="ArrayHashing\tsdf_voxel_hashing_array.h" />
     <ClInclude Include="ArrayHashing\voxel_center_array.h" />
     <ClInclude Include="ArrayHashing\voxel_hashing_array.h" />
     <ClInclude Include="ArrayHashing\voxel_index_array.h" />

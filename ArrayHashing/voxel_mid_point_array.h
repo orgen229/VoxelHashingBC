@@ -13,16 +13,7 @@ namespace voxelStruct {
         VoxelMidPointArray(float voxel_size, float mini_voxel_size);
 
         void addPoint(const PointT& point) override;
-        PointT getMidPointInMiniVoxel(
-            const std::tuple<int, int, int>& voxel_index,
-            const std::tuple<int, int, int>& mini_voxel_index) const;
-
-    private:
-        std::unordered_map<
-            std::tuple<int, int, int>,
-            std::shared_ptr<std::array<std::array<std::array<PointT, mini_grid_size>, mini_grid_size>, mini_grid_size>>,
-            VoxelHash
-        > mid_point_map_;
+     
     };
 
 }

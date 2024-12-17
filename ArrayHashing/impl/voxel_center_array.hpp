@@ -11,13 +11,15 @@ namespace voxelStruct {
 
     template <typename PointT, std::size_t mini_grid_size>
     void VoxelCenterArray<PointT, mini_grid_size>::addPoint(const PointT& point) {
+        
         auto voxel_index = this->getVoxelIndex(point);
 
-   
-        if (center_map_.find(voxel_index) == center_map_.end()) {
-            center_map_[voxel_index] = std::make_shared<std::array<std::array<std::array<PointT, mini_grid_size>, mini_grid_size>, mini_grid_size>>();
+       
+        if (this->voxel_map_.find(voxel_index) == this->voxel_map_.end()) {
+            this->voxel_map_[voxel_index] = this->createEmptyMiniVoxels();
         }
 
+        
         auto mini_voxel_index = this->getMiniVoxelIndex(point, voxel_index);
 
         int mini_x = std::get<0>(mini_voxel_index);
@@ -25,30 +27,24 @@ namespace voxelStruct {
         int mini_z = std::get<2>(mini_voxel_index);
 
         
-        PointT& center = (*center_map_[voxel_index])[mini_x][mini_y][mini_z];
+        auto& mini_voxel_point = (*this->voxel_map_[voxel_index])[mini_x][mini_y][mini_z];
 
-        if (center.x == 0 && center.y == 0 && center.z == 0) { 
-            center.x = (mini_x + 0.5f) * this->mini_voxel_size_;
-            center.y = (mini_y + 0.5f) * this->mini_voxel_size_;
-            center.z = (mini_z + 0.5f) * this->mini_voxel_size_;
+        
+        if (mini_voxel_point.empty()) {
+            PointT center;
+            center.x = voxel_index_to_world(mini_x, this->mini_voxel_size_);
+            center.y = voxel_index_to_world(mini_y, this->mini_voxel_size_);
+            center.z = voxel_index_to_world(mini_z, this->mini_voxel_size_);
+            mini_voxel_point.push_back(center);
         }
     }
 
+
+
+
     template <typename PointT, std::size_t mini_grid_size>
-    PointT VoxelCenterArray<PointT, mini_grid_size>::getCenterInMiniVoxel(
-        const std::tuple<int, int, int>& voxel_index,
-        const std::tuple<int, int, int>& mini_voxel_index) const {
-
-        auto voxel_it = center_map_.find(voxel_index);
-        if (voxel_it != center_map_.end()) {
-            int mini_x = std::get<0>(mini_voxel_index);
-            int mini_y = std::get<1>(mini_voxel_index);
-            int mini_z = std::get<2>(mini_voxel_index);
-
-            return (*voxel_it->second)[mini_x][mini_y][mini_z];
-        }
-
-        return PointT(); 
+    float VoxelCenterArray<PointT, mini_grid_size>::voxel_index_to_world(int index, float voxel_size) const {
+        return (index + 0.5f) * voxel_size;
     }
 
 }
