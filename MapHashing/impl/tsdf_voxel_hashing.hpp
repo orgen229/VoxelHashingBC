@@ -93,9 +93,9 @@ namespace voxelStruct {
             return truncation_distance_;
         }
 
-        return mini_voxel_it->second; // Возвращаем TSDF значение
+        return mini_voxel_it->second; 
     }
 
-} // namespace voxelStruct
+} 
 
-#endif // TSDF_VOXEL_HASHING_HPP
+#endif

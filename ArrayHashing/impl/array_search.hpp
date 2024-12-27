@@ -65,7 +65,7 @@ namespace voxelStruct {
         int layer_count = static_cast<int>(std::ceil(max_distance / this->mini_voxel_size_));
         float max_distance_squared = max_distance * max_distance;
 
-        // Оптимизация: обработка большого количества вокселей параллельно
+        
 #pragma omp parallel for
         for (int dx = -layer_count; dx <= layer_count; ++dx) {
             for (int dy = -layer_count; dy <= layer_count; ++dy) {
@@ -78,25 +78,25 @@ namespace voxelStruct {
                         neighbor_voxel_index
                     );
 
-                    // Проверка существования большого вокселя
+                   
                     auto voxel_it = this->voxel_map_.find(neighbor_voxel_index);
                     if (voxel_it == this->voxel_map_.end()) {
-                        continue; // Воксель не существует
+                        continue; 
                     }
 
-                    // Проверка диапазона индексов мини-вокселя
+                    
                     if (nx < 0 || nx >= (int)mini_grid_size ||
                         ny < 0 || ny >= (int)mini_grid_size ||
                         nz < 0 || nz >= (int)mini_grid_size) {
-                        continue; // Индекс за границами
+                        continue; 
                     }
 
                     const auto& mini_voxel_points = (*voxel_it->second)[nx][ny][nz];
                     if (mini_voxel_points.empty()) {
-                        continue; // Мини-воксель пуст
+                        continue; 
                     }
 
-                    // Поиск ближайших точек
+                   
                     for (const auto& point : mini_voxel_points) {
                         float dx = query_point.x - point.x;
                         float dy = query_point.y - point.y;
@@ -153,25 +153,24 @@ namespace voxelStruct {
                         neighbor_voxel_index
                     );
 
-                    // Проверка существования большого вокселя
+                    
                     auto voxel_it = this->voxel_map_.find(neighbor_voxel_index);
                     if (voxel_it == this->voxel_map_.end()) {
-                        continue; // Воксель не существует
+                        continue; 
                     }
 
-                    // Проверка диапазона индексов мини-вокселя
+                    
                     if (nx < 0 || nx >= (int)mini_grid_size ||
                         ny < 0 || ny >= (int)mini_grid_size ||
                         nz < 0 || nz >= (int)mini_grid_size) {
-                        continue; // Индекс за границами
+                        continue; 
                     }
 
                     const auto& mini_voxel_points = (*voxel_it->second)[nx][ny][nz];
                     if (mini_voxel_points.empty()) {
-                        continue; // Мини-воксель пуст
+                        continue; 
                     }
 
-                    // Поиск всех точек в радиусе
                     for (const auto& point : mini_voxel_points) {
                         float dx = query_point.x - point.x;
                         float dy = query_point.y - point.y;

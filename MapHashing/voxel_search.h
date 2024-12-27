@@ -23,8 +23,8 @@ namespace voxelStruct {
         std::tuple<int, int, int> adjustIndices(int x, int y, int z, std::tuple<int, int, int>& voxel_index) const;
     };
 
-} // namespace voxelStruct
+} 
 
 #include "impl/voxel_search.hpp"
 
-#endif // VOXEL_SEARCH_H
+#endif 

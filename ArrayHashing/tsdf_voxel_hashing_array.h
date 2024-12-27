@@ -1,7 +1,7 @@
 #ifndef TSDF_VOXEL_HASHING_ARRAY_H
 #define TSDF_VOXEL_HASHING_ARRAY_H
 
-#include "array_search.h" // Предполагается, что тут определён ArraySearch
+#include "array_search.h" 
 #include <memory>
 #include <unordered_map>
 #include <tuple>
@@ -13,29 +13,17 @@ namespace voxelStruct {
     template <typename PointT, std::size_t mini_grid_size>
     class TSDFVoxelHashingArray : public ArraySearch<PointT, mini_grid_size> {
     public:
-        /**
-         * @param voxel_size Размер вокселя
-         * @param mini_voxel_size Размер мини-вокселя
-         * @param truncation_distance Порог отсечения для TSDF
-         */
+        
         TSDFVoxelHashingArray(float voxel_size, float mini_voxel_size, float truncation_distance);
 
-        /**
-         * Рассчитать TSDF для всех мини-вокселей после того,
-         * как все точки были добавлены через addPoint()
-         * @param camera_origin Координаты камеры
-         */
+        
         void calculateTSDF(const PointT& camera_origin);
 
 
 
         void calculateTSDFForVoxel(const std::tuple<int, int, int>& voxel_index, const PointT& camera_origin);
 
-        /**
-         * Получить значение TSDF в заданной точке
-         * @param query_point Точка, для которой нужно получить значение TSDF
-         * @return Значение TSDF или truncation_distance_, если данных нет
-         */
+        
         float getTSDFValueAt(const PointT& query_point) const;
 
     protected:
@@ -54,4 +42,4 @@ namespace voxelStruct {
 
 #include "impl/tsdf_voxel_hashing_array.hpp"
 
-#endif // TSDF_VOXEL_HASHING_ARRAY_H
+#endif 

@@ -145,6 +145,6 @@ namespace voxelStruct {
         return result;
     }
 
-} // namespace voxelStruct
+} 
 
-#endif // VOXEL_SEARCH_HPP
+#endif 

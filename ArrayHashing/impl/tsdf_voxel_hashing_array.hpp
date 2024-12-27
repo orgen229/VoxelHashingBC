@@ -16,12 +16,12 @@ namespace voxelStruct {
 
     template <typename PointT, std::size_t mini_grid_size>
     void TSDFVoxelHashingArray<PointT, mini_grid_size>::calculateTSDF(const PointT& camera_origin) {
-        // Параллельный цикл для большого количества данных
+       
 #pragma omp parallel for
         for (auto voxel_it = this->voxel_map_.begin(); voxel_it != this->voxel_map_.end(); ++voxel_it) {
             const auto& voxel_index = voxel_it->first;
 
-            // Инициализируем TSDF сетку для текущего вокселя, если она ещё не создана
+           
 #pragma omp critical
             if (voxel_tsdf_map_.find(voxel_index) == voxel_tsdf_map_.end()) {
                 voxel_tsdf_map_[voxel_index] = createEmptyTSDFGrid();
@@ -30,7 +30,7 @@ namespace voxelStruct {
             auto& mini_voxels = *voxel_it->second;
             auto& tsdf_grid = *voxel_tsdf_map_[voxel_index];
 
-            // Предварительные вычисления для центров мини-вокселей
+            
             std::array<std::array<std::array<PointT, mini_grid_size>, mini_grid_size>, mini_grid_size> mini_voxel_centers;
             for (int mx = 0; mx < (int)mini_grid_size; ++mx) {
                 for (int my = 0; my < (int)mini_grid_size; ++my) {
@@ -49,51 +49,51 @@ namespace voxelStruct {
                 }
             }
 
-            // Проход по всем мини-вокселям
+            
             for (int mx = 0; mx < (int)mini_grid_size; ++mx) {
                 for (int my = 0; my < (int)mini_grid_size; ++my) {
                     for (int mz = 0; mz < (int)mini_grid_size; ++mz) {
                         const PointT& voxel_center = mini_voxel_centers[mx][my][mz];
 
-                        // Поиск ближайшей точки
+                       
                         auto neighbors = this->findKNearestNeighbors(voxel_center, 1, truncation_distance_);
                         float tsdf_value;
 
                         if (neighbors.empty()) {
-                            // Если точек нет в пределах truncation_distance_, TSDF = truncation_distance_
+                            
                             tsdf_value = truncation_distance_;
                         }
                         else {
-                            // Находим ближайшую точку
+                           
                             const auto& nearest_point = neighbors.front();
 
-                            // Вектор от камеры до центра мини-вокселя
+                         
                             float vx = voxel_center.x - camera_origin.x;
                             float vy = voxel_center.y - camera_origin.y;
                             float vz = voxel_center.z - camera_origin.z;
 
-                            // Вектор от камеры до ближайшей точки
+                         
                             float px = nearest_point.x - camera_origin.x;
                             float py = nearest_point.y - camera_origin.y;
                             float pz = nearest_point.z - camera_origin.z;
 
-                            // Расстояние от центра мини-вокселя до ближайшей точки
+                           
                             float dx = nearest_point.x - voxel_center.x;
                             float dy = nearest_point.y - voxel_center.y;
                             float dz = nearest_point.z - voxel_center.z;
                             float dist = std::sqrt(dx * dx + dy * dy + dz * dz);
 
-                            // Нормализация TSDF значений
+                          
                             tsdf_value = (dist > truncation_distance_) ? truncation_distance_ : dist;
 
-                            // Определяем знак TSDF на основе скалярного произведения
+                            
                             float dot_product = vx * px + vy * py + vz * pz;
                             if (dot_product < 0) {
-                                tsdf_value = -tsdf_value; // Мини-воксель за точкой (обратное направление)
+                                tsdf_value = -tsdf_value; 
                             }
                         }
 
-                        // Сохраняем результат в TSDF сетке
+                        
                         tsdf_grid[mx][my][mz] = tsdf_value;
                     }
                 }
@@ -103,14 +103,14 @@ namespace voxelStruct {
 
     template <typename PointT, std::size_t mini_grid_size>
     void TSDFVoxelHashingArray<PointT, mini_grid_size>::calculateTSDFForVoxel(const std::tuple<int, int, int>& voxel_index, const PointT& camera_origin) {
-        // Проверяем, существует ли воксель
+       
         auto voxel_it = this->voxel_map_.find(voxel_index);
         if (voxel_it == this->voxel_map_.end()) {
             std::cerr << "Voxel not found for index: (" << std::get<0>(voxel_index) << ", " << std::get<1>(voxel_index) << ", " << std::get<2>(voxel_index) << ")" << std::endl;
             return;
         }
 
-        // Инициализируем TSDF сетку для данного вокселя, если она ещё не создана
+       
         if (voxel_tsdf_map_.find(voxel_index) == voxel_tsdf_map_.end()) {
             voxel_tsdf_map_[voxel_index] = createEmptyTSDFGrid();
         }
@@ -118,7 +118,7 @@ namespace voxelStruct {
         auto& mini_voxels = *voxel_it->second;
         auto& tsdf_grid = *voxel_tsdf_map_[voxel_index];
 
-        // Предварительные вычисления для центров мини-вокселей
+        
         std::array<std::array<std::array<PointT, mini_grid_size>, mini_grid_size>, mini_grid_size> mini_voxel_centers;
         for (int mx = 0; mx < (int)mini_grid_size; ++mx) {
             for (int my = 0; my < (int)mini_grid_size; ++my) {
@@ -137,51 +137,51 @@ namespace voxelStruct {
             }
         }
 
-        // Проход по всем мини-вокселям в данном вокселе
+        
         for (int mx = 0; mx < (int)mini_grid_size; ++mx) {
             for (int my = 0; my < (int)mini_grid_size; ++my) {
                 for (int mz = 0; mz < (int)mini_grid_size; ++mz) {
                     const PointT& voxel_center = mini_voxel_centers[mx][my][mz];
 
-                    // Поиск ближайшей точки
+                   
                     auto neighbors = this->findKNearestNeighbors(voxel_center, 1, truncation_distance_);
                     float tsdf_value;
 
                     if (neighbors.empty()) {
-                        // Если точек нет в пределах truncation_distance_, TSDF = truncation_distance_
+                        
                         tsdf_value = truncation_distance_;
                     }
                     else {
-                        // Находим ближайшую точку
+                       
                         const auto& nearest_point = neighbors.front();
 
-                        // Вектор от камеры до центра мини-вокселя
+                    
                         float vx = voxel_center.x - camera_origin.x;
                         float vy = voxel_center.y - camera_origin.y;
                         float vz = voxel_center.z - camera_origin.z;
 
-                        // Вектор от камеры до ближайшей точки
+                       
                         float px = nearest_point.x - camera_origin.x;
                         float py = nearest_point.y - camera_origin.y;
                         float pz = nearest_point.z - camera_origin.z;
 
-                        // Расстояние от центра мини-вокселя до ближайшей точки
+                     
                         float dx = nearest_point.x - voxel_center.x;
                         float dy = nearest_point.y - voxel_center.y;
                         float dz = nearest_point.z - voxel_center.z;
                         float dist = std::sqrt(dx * dx + dy * dy + dz * dz);
 
-                        // Нормализация TSDF значений
+                      
                         tsdf_value = (dist > truncation_distance_) ? truncation_distance_ : dist;
 
-                        // Определяем знак TSDF на основе скалярного произведения
+                     
                         float dot_product = vx * px + vy * py + vz * pz;
                         if (dot_product < 0) {
-                            tsdf_value = -tsdf_value; // Мини-воксель за точкой (обратное направление)
+                            tsdf_value = -tsdf_value;
                         }
                     }
 
-                    // Сохраняем результат в TSDF сетке
+                    
                     tsdf_grid[mx][my][mz] = tsdf_value;
                 }
             }
