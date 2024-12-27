@@ -11,38 +11,37 @@ namespace voxelStruct {
 
     template <typename PointT>
     void VoxelCenterOnly<PointT>::addPoint(const PointT& point) {
+      
         auto voxel_index = this->getVoxelIndex(point);
 
        
-        if (center_map_.find(voxel_index) == center_map_.end()) {
-            center_map_[voxel_index] = {};
+        if (this->voxel_map_.find(voxel_index) == this->voxel_map_.end()) {
+            this->voxel_map_[voxel_index] = std::unordered_map<std::tuple<int, int, int>, std::vector<PointT>, VoxelHash>();
         }
 
+      
         auto mini_voxel_index = this->getMiniVoxelIndex(point, voxel_index);
 
        
-        if (center_map_[voxel_index].find(mini_voxel_index) == center_map_[voxel_index].end()) {
+        auto& mini_voxel_map = this->voxel_map_[voxel_index];
+        if (mini_voxel_map.find(mini_voxel_index) == mini_voxel_map.end()) {
+           
+            mini_voxel_map[mini_voxel_index] = std::vector<PointT>();
+
+           
             PointT center;
-            center.x = (std::get<0>(mini_voxel_index) + 0.5f) * this->mini_voxel_size_;
-            center.y = (std::get<1>(mini_voxel_index) + 0.5f) * this->mini_voxel_size_;
-            center.z = (std::get<2>(mini_voxel_index) + 0.5f) * this->mini_voxel_size_;
-            center_map_[voxel_index][mini_voxel_index] = center;
+            center.x = voxel_index_to_world(std::get<0>(mini_voxel_index), this->mini_voxel_size_);
+            center.y = voxel_index_to_world(std::get<1>(mini_voxel_index), this->mini_voxel_size_);
+            center.z = voxel_index_to_world(std::get<2>(mini_voxel_index), this->mini_voxel_size_);
+
+           
+            mini_voxel_map[mini_voxel_index].push_back(center);
         }
     }
 
     template <typename PointT>
-    PointT VoxelCenterOnly<PointT>::getCenterInMiniVoxel(
-        const std::tuple<int, int, int>& voxel_index,
-        const std::tuple<int, int, int>& mini_voxel_index) const {
-
-        auto voxel_it = center_map_.find(voxel_index);
-        if (voxel_it != center_map_.end()) {
-            auto mini_it = voxel_it->second.find(mini_voxel_index);
-            if (mini_it != voxel_it->second.end()) {
-                return mini_it->second;
-            }
-        }
-        return PointT(); 
+    float VoxelCenterOnly<PointT>::voxel_index_to_world(int index, float voxel_size) const {
+        return (index + 0.5f) * voxel_size;
     }
 
 }

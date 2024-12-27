@@ -2,6 +2,9 @@
 #define ARRAY_SEARCH_HPP
 
 #include "../array_search.h"
+#include <cmath>
+#include <limits>
+#include <omp.h>
 
 namespace voxelStruct {
 
@@ -17,7 +20,7 @@ namespace voxelStruct {
             --std::get<0>(voxel_index);
             x += mini_grid_size;
         }
-        else if (x >= mini_grid_size) {
+        else if (x >= (int)mini_grid_size) {
             ++std::get<0>(voxel_index);
             x -= mini_grid_size;
         }
@@ -26,7 +29,7 @@ namespace voxelStruct {
             --std::get<1>(voxel_index);
             y += mini_grid_size;
         }
-        else if (y >= mini_grid_size) {
+        else if (y >= (int)mini_grid_size) {
             ++std::get<1>(voxel_index);
             y -= mini_grid_size;
         }
@@ -35,7 +38,7 @@ namespace voxelStruct {
             --std::get<2>(voxel_index);
             z += mini_grid_size;
         }
-        else if (z >= mini_grid_size) {
+        else if (z >= (int)mini_grid_size) {
             ++std::get<2>(voxel_index);
             z -= mini_grid_size;
         }
@@ -46,16 +49,24 @@ namespace voxelStruct {
     template <typename PointT, std::size_t mini_grid_size, typename BaseClass>
     std::vector<PointT> ArraySearch<PointT, mini_grid_size, BaseClass>::findKNearestNeighbors(
         const PointT& query_point, int k, float max_distance) const {
+
+
+        std::cout << " Noez" << std::endl;
+
         using Neighbor = std::pair<float, PointT>;
         auto cmp = [](const Neighbor& left, const Neighbor& right) {
             return left.first > right.first;
-        };
+            };
 
         std::priority_queue<Neighbor, std::vector<Neighbor>, decltype(cmp)> neighbors{ cmp };
         auto voxel_index = this->getVoxelIndex(query_point);
         auto mini_voxel_index = this->getMiniVoxelIndex(query_point, voxel_index);
-        int layer_count = static_cast<int>(std::ceil(max_distance / this->mini_voxel_size_));
 
+        int layer_count = static_cast<int>(std::ceil(max_distance / this->mini_voxel_size_));
+        float max_distance_squared = max_distance * max_distance;
+
+        // Оптимизация: обработка большого количества вокселей параллельно
+#pragma omp parallel for
         for (int dx = -layer_count; dx <= layer_count; ++dx) {
             for (int dy = -layer_count; dy <= layer_count; ++dy) {
                 for (int dz = -layer_count; dz <= layer_count; ++dz) {
@@ -67,23 +78,42 @@ namespace voxelStruct {
                         neighbor_voxel_index
                     );
 
+                    // Проверка существования большого вокселя
                     auto voxel_it = this->voxel_map_.find(neighbor_voxel_index);
-                    if (voxel_it == this->voxel_map_.end()) continue;
+                    if (voxel_it == this->voxel_map_.end()) {
+                        continue; // Воксель не существует
+                    }
 
-                    const auto& points = (*voxel_it->second)[nx][ny][nz];
-                    for (const auto& point : points) {
-                        float distance = std::sqrt(
-                            std::pow(query_point.x - point.x, 2) +
-                            std::pow(query_point.y - point.y, 2) +
-                            std::pow(query_point.z - point.z, 2)
-                        );
+                    // Проверка диапазона индексов мини-вокселя
+                    if (nx < 0 || nx >= (int)mini_grid_size ||
+                        ny < 0 || ny >= (int)mini_grid_size ||
+                        nz < 0 || nz >= (int)mini_grid_size) {
+                        continue; // Индекс за границами
+                    }
 
-                        if (distance > 0 && distance <= max_distance) {
-                            if (neighbors.size() < k) {
-                                neighbors.emplace(distance, point);
-                            } else if (distance < neighbors.top().first) {
-                                neighbors.pop();
-                                neighbors.emplace(distance, point);
+                    const auto& mini_voxel_points = (*voxel_it->second)[nx][ny][nz];
+                    if (mini_voxel_points.empty()) {
+                        continue; // Мини-воксель пуст
+                    }
+
+                    // Поиск ближайших точек
+                    for (const auto& point : mini_voxel_points) {
+                        float dx = query_point.x - point.x;
+                        float dy = query_point.y - point.y;
+                        float dz = query_point.z - point.z;
+                        float distance_squared = dx * dx + dy * dy + dz * dz;
+
+                        if (distance_squared > 0 && distance_squared <= max_distance_squared) {
+                            float distance = std::sqrt(distance_squared);
+#pragma omp critical
+                            {
+                                if ((int)neighbors.size() < k) {
+                                    neighbors.emplace(distance, point);
+                                }
+                                else if (distance < neighbors.top().first) {
+                                    neighbors.pop();
+                                    neighbors.emplace(distance, point);
+                                }
                             }
                         }
                     }
@@ -97,6 +127,7 @@ namespace voxelStruct {
             result.push_back(neighbors.top().second);
             neighbors.pop();
         }
+        std::cout << " Sosi" << std::endl;
         return result;
     }
 
@@ -107,7 +138,9 @@ namespace voxelStruct {
         std::vector<PointT> result;
         auto voxel_index = this->getVoxelIndex(query_point);
         auto mini_voxel_index = this->getMiniVoxelIndex(query_point, voxel_index);
+
         int layer_count = static_cast<int>(std::ceil(max_distance / this->mini_voxel_size_));
+        float max_distance_squared = max_distance * max_distance;
 
         for (int dx = -layer_count; dx <= layer_count; ++dx) {
             for (int dy = -layer_count; dy <= layer_count; ++dy) {
@@ -120,18 +153,32 @@ namespace voxelStruct {
                         neighbor_voxel_index
                     );
 
+                    // Проверка существования большого вокселя
                     auto voxel_it = this->voxel_map_.find(neighbor_voxel_index);
-                    if (voxel_it == this->voxel_map_.end()) continue;
+                    if (voxel_it == this->voxel_map_.end()) {
+                        continue; // Воксель не существует
+                    }
 
-                    const auto& points = (*voxel_it->second)[nx][ny][nz];
-                    for (const auto& point : points) {
-                        float distance = std::sqrt(
-                            std::pow(query_point.x - point.x, 2) +
-                            std::pow(query_point.y - point.y, 2) +
-                            std::pow(query_point.z - point.z, 2)
-                        );
+                    // Проверка диапазона индексов мини-вокселя
+                    if (nx < 0 || nx >= (int)mini_grid_size ||
+                        ny < 0 || ny >= (int)mini_grid_size ||
+                        nz < 0 || nz >= (int)mini_grid_size) {
+                        continue; // Индекс за границами
+                    }
 
-                        if (distance > 0 && distance <= max_distance) {
+                    const auto& mini_voxel_points = (*voxel_it->second)[nx][ny][nz];
+                    if (mini_voxel_points.empty()) {
+                        continue; // Мини-воксель пуст
+                    }
+
+                    // Поиск всех точек в радиусе
+                    for (const auto& point : mini_voxel_points) {
+                        float dx = query_point.x - point.x;
+                        float dy = query_point.y - point.y;
+                        float dz = query_point.z - point.z;
+                        float distance_squared = dx * dx + dy * dy + dz * dz;
+
+                        if (distance_squared > 0 && distance_squared <= max_distance_squared) {
                             result.push_back(point);
                         }
                     }
@@ -142,6 +189,6 @@ namespace voxelStruct {
         return result;
     }
 
-} 
+}
 
 #endif

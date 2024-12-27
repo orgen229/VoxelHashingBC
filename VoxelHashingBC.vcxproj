@@ -146,11 +146,13 @@
     <ClInclude Include="ArrayHashing\voxel_hashing_array.h" />
     <ClInclude Include="ArrayHashing\voxel_index_array.h" />
     <ClInclude Include="ArrayHashing\voxel_mid_point_array.h" />
+    <ClInclude Include="MapHashing\impl\tsdf_voxel_hashing.hpp" />
     <ClInclude Include="MapHashing\impl\voxel_center_only.hpp" />
     <ClInclude Include="MapHashing\impl\voxel_hashing.hpp" />
     <ClInclude Include="MapHashing\impl\voxel_index_only.hpp" />
     <ClInclude Include="MapHashing\impl\voxel_mid_point.hpp" />
     <ClInclude Include="MapHashing\impl\voxel_search.hpp" />
+    <ClInclude Include="MapHashing\tsdf_voxel_hashing.h" />
     <ClInclude Include="MapHashing\voxel_center_only.h" />
     <ClInclude Include="MapHashing\voxel_hashing.h" />
     <ClInclude Include="MapHashing\voxel_index_only.h" />

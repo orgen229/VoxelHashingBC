@@ -103,5 +103,11 @@
     <ClInclude Include="ArrayHashing\tsdf_voxel_hashing_array.h">
       <Filter>Файлы заголовков\array</Filter>
     </ClInclude>
+    <ClInclude Include="MapHashing\tsdf_voxel_hashing.h">
+      <Filter>Файлы заголовков\tuple</Filter>
+    </ClInclude>
+    <ClInclude Include="MapHashing\impl\tsdf_voxel_hashing.hpp">
+      <Filter>Файлы заголовков\tuple\impl</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

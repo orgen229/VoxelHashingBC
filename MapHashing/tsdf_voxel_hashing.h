@@ -1,24 +1,21 @@
-#ifndef TSDF_VOXEL_HASHING_ARRAY_H
-#define TSDF_VOXEL_HASHING_ARRAY_H
+#ifndef TSDF_VOXEL_HASHING_H
+#define TSDF_VOXEL_HASHING_H
 
-#include "array_search.h" // Предполагается, что тут определён ArraySearch
-#include <memory>
+#include "voxel_search.h" // Подключение VoxelSearch
 #include <unordered_map>
 #include <tuple>
-#include <array>
-#include <vector>
 
 namespace voxelStruct {
 
-    template <typename PointT, std::size_t mini_grid_size>
-    class TSDFVoxelHashingArray : public ArraySearch<PointT, mini_grid_size> {
+    template <typename PointT>
+    class TSDFVoxelHashing : public VoxelSearch<PointT> {
     public:
         /**
          * @param voxel_size Размер вокселя
          * @param mini_voxel_size Размер мини-вокселя
          * @param truncation_distance Порог отсечения для TSDF
          */
-        TSDFVoxelHashingArray(float voxel_size, float mini_voxel_size, float truncation_distance);
+        TSDFVoxelHashing(float voxel_size, float mini_voxel_size, float truncation_distance);
 
         /**
          * Рассчитать TSDF для всех мини-вокселей после того,
@@ -26,10 +23,6 @@ namespace voxelStruct {
          * @param camera_origin Координаты камеры
          */
         void calculateTSDF(const PointT& camera_origin);
-
-
-
-        void calculateTSDFForVoxel(const std::tuple<int, int, int>& voxel_index, const PointT& camera_origin);
 
         /**
          * Получить значение TSDF в заданной точке
@@ -41,17 +34,19 @@ namespace voxelStruct {
     protected:
         float truncation_distance_;
 
+        // Основная структура данных для хранения TSDF значений
         std::unordered_map<
-            std::tuple<int, int, int>,
-            std::shared_ptr<std::array<std::array<std::array<float, mini_grid_size>, mini_grid_size>, mini_grid_size>>,
+            std::tuple<int, int, int>, // Индекс основного вокселя
+            std::unordered_map<std::tuple<int, int, int>, float, VoxelHash>, // TSDF для каждого мини-вокселя
             VoxelHash
         > voxel_tsdf_map_;
 
-        std::shared_ptr<std::array<std::array<std::array<float, mini_grid_size>, mini_grid_size>, mini_grid_size>> createEmptyTSDFGrid() const;
+        // Метод для расчёта TSDF значений для одного вокселя
+        void calculateTSDFForVoxel(const std::tuple<int, int, int>& voxel_index, const PointT& camera_origin);
     };
 
 }
 
-#include "impl/tsdf_voxel_hashing_array.hpp"
+#include "impl/tsdf_voxel_hashing.hpp"
 
-#endif // TSDF_VOXEL_HASHING_ARRAY_H
+#endif // TSDF_VOXEL_HASHING_H

@@ -72,56 +72,131 @@ int main() {
 
     return 0;
 }*/
-
-
+/*
 #include <iostream>
 #include <pcl/io/ply_io.h>
 #include <pcl/point_types.h>
-#include "ArrayHashing/tsdf_voxel_hashing_array.h" 
+#include "ArrayHashing/tsdf_voxel_hashing_array.h"
+#include "ArrayHashing/array_search.h"
 
-int main(int argc, char** argv) {
-    // Load the point cloud using PCL
+
+#include "MapHashing/tsdf_voxel_hashing.h"
+#include "MapHashing/voxel_search.h"
+
+int main() {
+    // Создаем объект TSDF
+    voxelStruct::TSDFVoxelHashing<pcl::PointXYZ> tsdf(0.05f, 0.05f / 4.0f, 0.03f);
+
+    // Загружаем точки из файла
     pcl::PointCloud<pcl::PointXYZ>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZ>());
     if (pcl::io::loadPLYFile<pcl::PointXYZ>("C:\\test2.ply", *cloud) == -1) {
-        std::cerr << "Could not load file C:\\test2.ply" << std::endl;
+        std::cerr << "Could not load file." << std::endl;
         return -1;
     }
 
-    std::cout << "Loaded " << cloud->points.size() << " points." << std::endl;
-
-    if (cloud->points.empty()) {
-        std::cerr << "The cloud is empty." << std::endl;
-        return -1;
-    }
-
-    // TSDF and grid parameters
-    const float voxel_size = 0.05f;
-    const float truncation_distance = 0.1f;
-    const std::size_t mini_grid_size = 4;
-
-    // Create TSDFVoxelHashingArray with pcl::PointXYZ
-    voxelStruct::TSDFVoxelHashingArray<pcl::PointXYZ, mini_grid_size> tsdf(
-        voxel_size, voxel_size / (float)mini_grid_size, truncation_distance
-    );
-
-    // Integrate the point cloud into TSDF
+    // Добавляем точки в TSDF
     for (const auto& p : cloud->points) {
-        tsdf.integratePoint(p, 1.0f); // weight = 1.0
+        tsdf.addPoint(p); // Используем метод базового класса
     }
 
-    // Use the first point from the cloud as the query point
-    pcl::PointXYZ query_point = cloud->points.front();
+    // Вычисляем TSDF относительно камеры
+    pcl::PointXYZ camera_origin(0.0f, 0.0f, 0.0f);
+    tsdf.calculateTSDF(camera_origin);
 
-    // Query TSDF value at the query_point
+    // Запрашиваем значение TSDF в произвольной точке
+    pcl::PointXYZ query_point(0.1f, 0.0f, 0.0f);
     float tsdf_value = tsdf.getTSDFValueAt(query_point);
-    std::cout << "TSDF value at (" << query_point.x << "," << query_point.y << "," << query_point.z << "): " << tsdf_value << std::endl;
+    std::cout << "TSDF value at (0.1, 0.0, 0.0): " << tsdf_value << std::endl;
 
-    // Find the closest measured point to query_point
-    pcl::PointXYZ closest_point = tsdf.getClosestMeasuredPoint(query_point);
-    std::cout << "Closest measured point to (" << query_point.x << "," << query_point.y << "," << query_point.z << "): ("
-        << closest_point.x << ", "
-        << closest_point.y << ", "
-        << closest_point.z << ")" << std::endl;
+    return 0;
+}
+*/
+// Test Program for Comparing VoxelHashingArray, Octree, and KDTree
+
+// Test Program for Comparing VoxelHashing, VoxelHashingArray, Octree, and KDTree
+
+#include <iostream>
+#include <chrono>
+#include <pcl/io/ply_io.h>
+#include <pcl/point_cloud.h>
+#include <pcl/octree/octree_search.h>
+#include <pcl/kdtree/kdtree_flann.h>
+#include "MapHashing/voxel_hashing.h"
+#include "ArrayHashing/voxel_hashing_array.h"
+
+using PointT = pcl::PointXYZ;
+
+void test_with_voxel_hashing(const pcl::PointCloud<PointT>::Ptr& cloud) {
+    voxelStruct::VoxelHashing<PointT> voxel_hashing(1.0f, 0.25f, 4);
+
+    auto start = std::chrono::high_resolution_clock::now();
+    for (const auto& point : cloud->points) {
+        voxel_hashing.addPoint(point);
+    }
+    auto end = std::chrono::high_resolution_clock::now();
+    std::cout << "VoxelHashing Insertion Time: "
+        << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << " ms" << std::endl;
+}
+
+void test_with_voxel_hashing_array(const pcl::PointCloud<PointT>::Ptr& cloud) {
+    constexpr std::size_t mini_grid_size = 4;
+    float voxel_size = 1.0f;
+    float mini_voxel_size = 0.25f;
+
+    voxelStruct::VoxelHashingArray<PointT, mini_grid_size> voxel_hashing(voxel_size, mini_voxel_size);
+
+    auto start = std::chrono::high_resolution_clock::now();
+    for (const auto& point : cloud->points) {
+        voxel_hashing.addPoint(point);
+    }
+    auto end = std::chrono::high_resolution_clock::now();
+    std::cout << "VoxelHashingArray Insertion Time: "
+        << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << " ms" << std::endl;
+}
+
+void test_with_octree(const pcl::PointCloud<PointT>::Ptr& cloud) {
+    float resolution = 1.0f;
+    pcl::octree::OctreePointCloudSearch<PointT> octree(resolution);
+
+    auto start = std::chrono::high_resolution_clock::now();
+    octree.setInputCloud(cloud);
+    octree.addPointsFromInputCloud();
+    auto end = std::chrono::high_resolution_clock::now();
+    std::cout << "Octree Insertion Time: "
+        << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << " ms" << std::endl;
+}
+
+void test_with_kdtree(const pcl::PointCloud<PointT>::Ptr& cloud) {
+    pcl::KdTreeFLANN<PointT> kdtree;
+
+    auto start = std::chrono::high_resolution_clock::now();
+    kdtree.setInputCloud(cloud);
+    auto end = std::chrono::high_resolution_clock::now();
+    std::cout << "KDTree Insertion Time: "
+        << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << " ms" << std::endl;
+}
+
+int main() {
+    std::string base_path = "C:\\tests\\test";
+    std::string extension = ".ply";
+
+    for (int i = 1; i <= 5; ++i) {
+        std::string file_path = base_path + std::to_string(i) + extension;
+        pcl::PointCloud<PointT>::Ptr cloud(new pcl::PointCloud<PointT>());
+
+        if (pcl::io::loadPLYFile(file_path, *cloud) == -1) {
+            std::cerr << "Error: Could not load file " << file_path << std::endl;
+            continue;
+        }
+
+        std::cout << "\nTesting file: " << file_path << std::endl;
+
+        test_with_voxel_hashing(cloud);
+        
+        test_with_octree(cloud);
+        test_with_kdtree(cloud);
+        test_with_voxel_hashing_array(cloud);
+    }
 
     return 0;
 }

@@ -10,17 +10,10 @@ namespace voxelStruct {
     public:
         VoxelMidPoint(float voxel_size, float mini_voxel_size, int mini_grid_size);
 
-        void addPoint(const PointT& point) override;
-        PointT getMidPointInMiniVoxel(
-            const std::tuple<int, int, int>& voxel_index,
-            const std::tuple<int, int, int>& mini_voxel_index) const;
+        void VoxelMidPoint<PointT>::addPoint(const PointT& point);
 
     private:
-        std::unordered_map<
-            std::tuple<int, int, int>,
-            std::unordered_map<std::tuple<int, int, int>, PointT, VoxelHash>,
-            VoxelHash
-        > mid_point_map_;
+        
     };
 
 }

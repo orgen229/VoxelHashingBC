@@ -7,11 +7,12 @@
 #include <queue>
 #include <cmath>
 #include <algorithm>
+#include <type_traits>
 
 namespace voxelStruct {
 
-    template <typename PointT>
-    class VoxelSearch : public VoxelHashing<PointT> {
+    template <typename PointT, typename BaseClass = VoxelHashing<PointT>>
+    class VoxelSearch : public BaseClass {
     public:
         VoxelSearch(float voxel_size, float mini_voxel_size, int mini_grid_size);
 
@@ -19,12 +20,11 @@ namespace voxelStruct {
         std::vector<PointT> findAllPointsWithinRadius(const PointT& query_point, float max_distance) const;
 
     private:
-        std::tuple<int, int, int> adjustIndices(
-            int x, int y, int z, std::tuple<int, int, int>& voxel_index) const;
+        std::tuple<int, int, int> adjustIndices(int x, int y, int z, std::tuple<int, int, int>& voxel_index) const;
     };
 
-}
+} // namespace voxelStruct
 
 #include "impl/voxel_search.hpp"
 
-#endif 
+#endif // VOXEL_SEARCH_H
