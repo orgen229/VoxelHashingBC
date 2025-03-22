@@ -9,6 +9,15 @@ namespace voxelStruct {
     VoxelMidPointArray<PointT, mini_grid_size>::VoxelMidPointArray(float voxel_size, float mini_voxel_size)
         : VoxelHashingArray<PointT, mini_grid_size>(voxel_size, mini_voxel_size) {}
 
+    
+    template <typename PointT, std::size_t mini_grid_size>
+    void VoxelMidPointArray<PointT, mini_grid_size>::addPoints(const pcl::PointCloud<PointT>& cloud) {
+        for (size_t i = 0; i < cloud.points.size(); ++i) {
+            this->addPoint(cloud.points[i]);
+        }
+    }
+    
+    
     template <typename PointT, std::size_t mini_grid_size>
     void VoxelMidPointArray<PointT, mini_grid_size>::addPoint(const PointT& point) {
        

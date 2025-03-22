@@ -16,6 +16,7 @@ namespace voxelStruct {
 
       
         void addPoint(const PointT& point) override;
+        void addPoints(const pcl::PointCloud<PointT>& cloud) override;
 
      
 

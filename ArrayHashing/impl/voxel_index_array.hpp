@@ -34,6 +34,13 @@ namespace voxelStruct {
     }
 
     template <typename PointT, std::size_t mini_grid_size>
+    void VoxelIndexArray<PointT, mini_grid_size>::addPoints(const pcl::PointCloud<PointT>& cloud) {
+        for (size_t i = 0; i < cloud.points.size(); ++i) {
+            this->addPoint(cloud.points[i]);
+        }
+    }
+
+    template <typename PointT, std::size_t mini_grid_size>
     std::vector<std::size_t> VoxelIndexArray<PointT, mini_grid_size>::getIndicesInMiniVoxel(
         const std::tuple<int, int, int>& voxel_index,
         const std::tuple<int, int, int>& mini_voxel_index) const {

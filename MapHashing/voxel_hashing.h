@@ -22,6 +22,7 @@ namespace voxelStruct {
     public:
         VoxelHashing(float voxel_size, float mini_voxel_size, int mini_grid_size);
 
+        virtual void addPoints(const pcl::PointCloud<PointT>& cloud);
         virtual void addPoint(const PointT& point);
         virtual bool IsPointInVoxel(const PointT& point);
         virtual std::vector<PointT> selectAllPointsFromVoxel(const std::tuple<int, int, int>& voxel_index);

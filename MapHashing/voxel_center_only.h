@@ -11,6 +11,7 @@ namespace voxelStruct {
         VoxelCenterOnly(float voxel_size, float mini_voxel_size, int mini_grid_size);
 
         void addPoint(const PointT& point) override;
+        void addPoints(const pcl::PointCloud<PointT>& cloud) override;
 
     private:
         float voxel_index_to_world(int index, float voxel_size) const;

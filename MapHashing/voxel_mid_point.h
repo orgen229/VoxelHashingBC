@@ -10,7 +10,8 @@ namespace voxelStruct {
     public:
         VoxelMidPoint(float voxel_size, float mini_voxel_size, int mini_grid_size);
 
-        void VoxelMidPoint<PointT>::addPoint(const PointT& point);
+        void addPoint(const PointT& point) override;
+        void addPoints(const pcl::PointCloud<PointT>& cloud) override;
 
     private:
         

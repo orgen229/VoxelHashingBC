@@ -40,6 +40,13 @@ namespace voxelStruct {
     }
 
     template <typename PointT>
+    void VoxelCenterOnly<PointT>::addPoints(const pcl::PointCloud<PointT>& cloud) {
+        for (size_t i = 0; i < cloud.points.size(); ++i) {
+            this->addPoint(cloud.points[i]);  
+        }
+    }
+
+    template <typename PointT>
     float VoxelCenterOnly<PointT>::voxel_index_to_world(int index, float voxel_size) const {
         return (index + 0.5f) * voxel_size;
     }

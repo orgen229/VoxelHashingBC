@@ -13,6 +13,7 @@ namespace voxelStruct {
         VoxelIndexArray(float voxel_size, float mini_voxel_size);
 
         void addPoint(const PointT& point) override;
+        void addPoints(const pcl::PointCloud<PointT>& cloud) override;
         std::vector<std::size_t> getIndicesInMiniVoxel(
             const std::tuple<int, int, int>& voxel_index,
             const std::tuple<int, int, int>& mini_voxel_index) const;

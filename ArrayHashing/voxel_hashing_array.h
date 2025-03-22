@@ -15,6 +15,7 @@ namespace voxelStruct {
     public:
         VoxelHashingArray(float voxel_size, float mini_voxel_size);
 
+        void addPoints(const pcl::PointCloud<PointT>& cloud) override;
         void addPoint(const PointT& point) override;
         bool IsPointInVoxel(const PointT& point) override;
         std::vector<PointT> selectAllPointsFromVoxel(const std::tuple<int, int, int>& voxel_index) override;

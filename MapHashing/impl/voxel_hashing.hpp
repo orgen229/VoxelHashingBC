@@ -12,6 +12,13 @@ namespace voxelStruct {
         mini_grid_size_(mini_grid_size) {}
 
     template <typename PointT>
+    void VoxelHashing<PointT>::addPoints(const pcl::PointCloud<PointT>& cloud) {
+        for (size_t i = 0; i < cloud.points.size(); ++i) {
+            addPoint(cloud.points[i]);
+        }
+    }
+
+    template <typename PointT>
     void VoxelHashing<PointT>::addPoint(const PointT& point) {
         auto voxel_index = getVoxelIndex(point);
         if (voxel_map_.find(voxel_index) == voxel_map_.end()) {

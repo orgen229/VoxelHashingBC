@@ -5,7 +5,7 @@
 #include <cmath>
 #include <limits>
 #include <queue>
-#include <algorithm>  // для std::reverse
+#include <algorithm>  
 
 namespace voxelStruct {
 
@@ -51,38 +51,34 @@ namespace voxelStruct {
     std::vector<PointT> VoxelSearch<PointT, BaseClass>::findKNearestNeighbors(
         const PointT& query_point, int k, float max_distance) const
     {
-      //  std::cout << " Noez" << std::endl;
 
-        // Создаём приоритетную очередь: top() = самая дальняя из хранимых,
-        // чтобы при добавлении новой (более близкой) точки можно было вытеснять самую далёкую.
         using Neighbor = std::pair<float, PointT>;
         auto cmp = [](const Neighbor& left, const Neighbor& right) {
-            // При таком cmp сверху очереди (top) окажется элемент с самым БОЛЬШИМ distance
-            // (то есть реализуется max-heap по first).
+
             return left.first > right.first;
             };
         std::priority_queue<Neighbor, std::vector<Neighbor>, decltype(cmp)> neighbors{ cmp };
 
-        // Ищем индекс крупного вокселя и мини-вокселя
+
         auto voxel_index = this->getVoxelIndex(query_point);
         auto mini_voxel_index = this->getMiniVoxelIndex(query_point, voxel_index);
 
         int layer_count = static_cast<int>(std::ceil(max_distance / this->mini_voxel_size_));
         float max_distance_squared = max_distance * max_distance;
 
-        // Локальная функция для добавления точек из конкретной мини-ячейки (nx, ny, nz)
+
         auto tryAddPointsFromMiniVoxel = [&](int nx, int ny, int nz, std::tuple<int, int, int> vox_idx)
             {
-                // Проверяем, есть ли вообще такой "крупный" воксель
+                
                 auto voxel_it = this->voxel_map_.find(vox_idx);
                 if (voxel_it == this->voxel_map_.end()) return;
 
-                // Внутри крупного вокселя ищем нужную мини-ячейку
+                
                 const auto& mini_voxel_map = voxel_it->second;
                 auto mini_voxel_it = mini_voxel_map.find({ nx, ny, nz });
                 if (mini_voxel_it == mini_voxel_map.end()) return;
 
-                // Перебираем все точки и при необходимости добавляем в очередь
+              
                 const auto& points = mini_voxel_it->second;
                 for (const auto& point : points) {
                     float dx = query_point.x - point.x;
@@ -93,24 +89,22 @@ namespace voxelStruct {
                     if (distance_squared > 0 && distance_squared <= max_distance_squared) {
                         float distance = std::sqrt(distance_squared);
 
-                        // Если ещё не набрали k точек, добавляем
+                        
                         if ((int)neighbors.size() < k) {
                             neighbors.emplace(distance, point);
                         }
-                        // Если уже k точек, проверяем, не ближе ли эта точка,
-                        // чем самая дальняя из уже имеющихся
+                     
                         else if (distance < neighbors.top().first) {
-                            neighbors.pop(); // вытесняем самую дальнюю
+                            neighbors.pop(); 
                             neighbors.emplace(distance, point);
                         }
                     }
                 }
             };
 
-        // Послойно обходим окрестности в пределах layer_count (по мини-индексам)
+
         for (int layer = 0; layer <= layer_count; ++layer) {
-            // Перебираем dx, dy, dz от -layer до layer
-            // и берём только "оболочку", где max(|dx|, |dy|, |dz|) == layer
+
             for (int dx = -layer; dx <= layer; ++dx) {
                 for (int dy = -layer; dy <= layer; ++dy) {
                     for (int dz = -layer; dz <= layer; ++dz) {
@@ -118,7 +112,7 @@ namespace voxelStruct {
                             continue;
                         }
 
-                        // Корректируем индексы мини-вокселя и при необходимости - крупного
+                       
                         auto neighbor_voxel_index = voxel_index;
                         auto [nx, ny, nz] = adjustIndices(
                             std::get<0>(mini_voxel_index) + dx,
@@ -127,31 +121,29 @@ namespace voxelStruct {
                             neighbor_voxel_index
                         );
 
-                        // Пытаемся добавить точки из этой мини-ячейки
+                       
                         tryAddPointsFromMiniVoxel(nx, ny, nz, neighbor_voxel_index);
                     }
                 }
             }
 
-            // После обработки "слоя" проверяем, достаточно ли уже точек
+          
             if ((int)neighbors.size() >= k) {
                 break;
             }
         }
 
-        // Переносим данные из очереди в вектор
-        // В очереди top() = самая дальняя из k, поэтому распакуем,
-        // а затем при желании развернём порядок.
+  
         std::vector<PointT> result;
         result.reserve(neighbors.size());
         while (!neighbors.empty()) {
             result.push_back(neighbors.top().second);
             neighbors.pop();
         }
-        // Если нужно упорядочить от ближайшей к дальней, то разворачиваем
+      
         std::reverse(result.begin(), result.end());
 
-       // std::cout << " sosi" << std::endl;
+
         return result;
     }
 
@@ -159,9 +151,7 @@ namespace voxelStruct {
     std::vector<PointT> VoxelSearch<PointT, BaseClass>::findAllPointsWithinRadius(
         const PointT& query_point, float max_distance) const
     {
-        // Тут можно оставить как есть (нет необходимости прерывать поиск досрочно)
-        // Либо аналогично обойти послойно - но в данном случае это не даёт выигрыша
-        // по логике досрочного выхода, поэтому оставим как есть.
+       
         std::vector<PointT> result;
         auto voxel_index = this->getVoxelIndex(query_point);
         auto mini_voxel_index = this->getMiniVoxelIndex(query_point, voxel_index);
@@ -204,6 +194,6 @@ namespace voxelStruct {
         return result;
     }
 
-} // namespace voxelStruct
+} 
 
-#endif // VOXEL_SEARCH_HPP
+#endif

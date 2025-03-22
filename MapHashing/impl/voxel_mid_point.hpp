@@ -53,6 +53,13 @@ namespace voxelStruct {
         point_vector.push_back(mid_point);
     }
 
+    template <typename PointT>
+    void VoxelMidPoint<PointT>::addPoints(const pcl::PointCloud<PointT>& cloud) {
+        for (size_t i = 0; i < cloud.points.size(); ++i) {
+            this->addPoint(cloud.points[i]);
+        }
+    }
+
 }
 
 #endif
