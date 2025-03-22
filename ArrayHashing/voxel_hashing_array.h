@@ -19,7 +19,7 @@ namespace voxelStruct {
         bool IsPointInVoxel(const PointT& point) override;
         std::vector<PointT> selectAllPointsFromVoxel(const std::tuple<int, int, int>& voxel_index) override;
 
-        
+
         std::unordered_map<
             std::tuple<int, int, int>,
             std::shared_ptr<std::array<std::array<std::array<std::vector<PointT>, mini_grid_size>, mini_grid_size>, mini_grid_size>>,

@@ -66,7 +66,7 @@ namespace voxelStruct {
         return vector;
     }
 
-    
+
     template <typename PointT>
     std::vector<PointT> VoxelHashing<PointT>::selectAllPointsFromMiniVoxel(
         const std::tuple<int, int, int>& voxel_index,
@@ -76,17 +76,17 @@ namespace voxelStruct {
 
         auto voxel_it = voxel_map_.find(voxel_index);
         if (voxel_it == voxel_map_.end()) {
-            return result; 
+            return result;
         }
 
         const auto& mini_voxel_map = voxel_it->second;
         auto mini_voxel_it = mini_voxel_map.find(mini_voxel_index);
 
         if (mini_voxel_it == mini_voxel_map.end()) {
-            return result; 
+            return result;
         }
 
-       
+
         result = mini_voxel_it->second;
         return result;
     }

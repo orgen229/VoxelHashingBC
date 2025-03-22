@@ -33,7 +33,7 @@ namespace voxelStruct {
         virtual std::tuple<int, int, int> getMiniVoxelIndex(const PointT& point, const std::tuple<int, int, int>& voxel_index) const;
 
     protected:
-       
+
         float voxel_size_, mini_voxel_size_;
         int mini_grid_size_;
 
